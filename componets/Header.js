@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import {HStack, Text, Button, IconButton} from "@chakra-ui/react"
+import {HStack, Text, Button, IconButton, Center, Input} from "@chakra-ui/react"
 import {
   Menu,
   MenuButton,
@@ -11,14 +11,17 @@ import {
   MenuDivider,
 } from '@chakra-ui/react'
 import {HamburgerIcon, AddIcon, ExternalLinkIcon, RepeatIcon, EditIcon} from "@chakra-ui/icons"
+import Inputforsearch from './InputForSearch'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
         
         
         
 export default function Header(){
-
     return (
+      <>
         <header>
-            <HStack justify="space-between" p="1rem">
+            <HStack justify="space-between" p="1rem" borderBottom="1px">
               <Link href="/">
                 <a>
                   <Text>GameWithMe</Text>
@@ -55,6 +58,7 @@ export default function Header(){
               </HStack>
             </HStack>
         </header>
+        </>
     )
         
 

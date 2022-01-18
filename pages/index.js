@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import Header from '../componets/Header'
+import Inputforsearch from '../componets/InputForSearch'
 
 
 
@@ -16,6 +17,7 @@ export default function Home() {
 
       <main>
         <Header />
+        <Inputforsearch />
       </main>
     </div>
   )

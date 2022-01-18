@@ -3,15 +3,14 @@ import Footer from "../componets/Footer";
 import Header from "../componets/Header";
 import { Input } from '@chakra-ui/react'
 import Users from "../componets/userSearch/users";
+import Inputforsearch from "../componets/InputForSearch";
 
 
 const Searchuser = () => {
     return (
         <>
             <Header />
-            <Center mb="2rem">
-                <Input placeholder="type keyword" w="80%"/>
-            </Center>
+            <Inputforsearch />
 
             <Center mb="3rem">
             <VStack w="100%">
