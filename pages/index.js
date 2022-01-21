@@ -3,10 +3,14 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import Header from '../componets/Header'
 import Inputforsearch from '../componets/InputForSearch'
+import { initFirebase } from '../firebase/initFirebase'
 
+import ReadData from "../componets/firestore/read"
+import WriteData from "../componets/firestore/write"
 
-
+initFirebase()
 export default function Home() {
+
   return (
     <div>
       <Head>
@@ -18,6 +22,8 @@ export default function Home() {
       <main>
         <Header />
         <Inputforsearch />
+        <WriteData />
+        <ReadData />
       </main>
     </div>
   )
