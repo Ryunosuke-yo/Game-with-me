@@ -7,8 +7,9 @@ import { initFirebase } from '../firebase/initFirebase'
 
 import ReadData from "../componets/firestore/read"
 import WriteData from "../componets/firestore/write"
+import FirebaseAuthComp from  "../componets/auth/firebaseAuth"
+import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth"
 
-initFirebase()
 export default function Home() {
 
   return (
@@ -21,6 +22,7 @@ export default function Home() {
 
       <main>
         <Header />
+        <FirebaseAuthComp />
         <Inputforsearch />
         <WriteData />
         <ReadData />

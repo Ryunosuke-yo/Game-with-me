@@ -21,7 +21,7 @@ export default function Header(){
     return (
       <>
         <header>
-            <HStack justify="space-between" p="1rem" borderBottom="1px">
+            <HStack justify="space-between" p="1rem" borderBottom="1px" mb="2rem">
               <Link href="/">
                 <a>
                   <Text>GameWithMe</Text>
