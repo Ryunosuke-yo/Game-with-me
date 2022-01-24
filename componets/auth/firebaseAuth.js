@@ -2,6 +2,8 @@ import {initFirebase} from "../../firebase/initFirebase"
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth"
 import {EmailAuthProvider, GithubAuthProvider, GoogleAuthProvider, TwitterAuthProvider, getAuth, onAuthStateChanged, signOut} from "firebase/auth"
 import { useEffect, useState } from "react"
+import mapUser from "../../firebase/mapUser"
+import { setUserCookie, getUserFromCookies, removeUserCookie } from "../../firebase/useCookies"
 
 initFirebase()
 
@@ -16,18 +18,25 @@ const firebaseAuthConfig = {
         TwitterAuthProvider.PROVIDER_ID,
         GithubAuthProvider.PROVIDER_ID,
     ],
-    signInSuccessUrl: '/',
+    // signInSuccessUrl: '/',
     credentialHelper : "none",
-    callbacks :false
+    callbacks : {
+        signInSuccessWithAuthResult : async ({user}, redirectUrl)=>{
+            const mappedUser = mapUser(user)
+            setUserCookie(mappedUser)
+            redirectUrl == "/"
+        }
+    }
 }
 const auth = getAuth()
 
 const FirebaseAuthComp = ()=>{
     const [isLoggedIn, setLoggedIn] = useState(false)
-
+    
     const signOutFunc = ()=>{
         signOut(auth).then(()=>{
             console.log("out")
+            removeUserCookie()
             setLoggedIn(false)
         }).catch((error) =>{
             console.log(error)
@@ -36,12 +45,15 @@ const FirebaseAuthComp = ()=>{
     useEffect(()=>{
         onAuthStateChanged(auth,(user)=>{
             if(user){
-                console.log(user.uid)
                 setLoggedIn(true)
+                console.log(auth.currentUser)
+                getUserFromCookies()
             } else {
                 console.log("not login")
+                setLoggedIn(false)
             }
         })
+       
         
     },[])
     return (

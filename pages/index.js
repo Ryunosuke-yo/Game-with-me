@@ -9,9 +9,18 @@ import ReadData from "../componets/firestore/read"
 import WriteData from "../componets/firestore/write"
 import FirebaseAuthComp from  "../componets/auth/firebaseAuth"
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth"
+import { getUserFromCookies, setUserCookie } from '../firebase/useCookies'
+import { useState } from 'react'
 
 export default function Home() {
-
+  const [cookie, setCookies] = useState()
+  if(cookie){
+    const coo = getUserFromCookies()
+    setCookies(coo)
+    setUserCookie(coo)
+  } else {
+    console.log("no cookies")
+  }
   return (
     <div>
       <Head>
