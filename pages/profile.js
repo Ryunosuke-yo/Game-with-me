@@ -2,15 +2,18 @@ import Header from "../componets/Header";
 import { Center, HStack, Image, Text, VStack, Flex, Avatar, Box, Badge, Grid, Heading } from "@chakra-ui/react";
 import Games from "../componets/profile/games";
 import Footer from "../componets/Footer";
+import {connectMongoose} from "../lib/mongodb"
+import users from "../lib/mongodb";
 
 
-const Profile = () => {
+
+const Profile = ({user}) => {
 
 
-
+    
     const gameLIst = ["Apex legends", "popo no boken", "monster Hundter", "GOd of War", "Shadow verse"]
 
-    const renderGames = gameLIst.map(el=><Games title={el}/>)
+    const renderGames = user.games.map(el=><Games title={el}/>)
 
 
     return (
@@ -27,7 +30,7 @@ const Profile = () => {
         </Center>
 
         <VStack mt="3rem" spacing="3rem" mb="4rem">
-            <Text borderBottom="1px">Tarou Watanabe</Text>
+            <Text borderBottom="1px">{user.name}</Text>
             <Text borderBottom="1px">Age  : 106</Text>
             <Heading as="h1" fontWeight="lighter"  fontSize="2rem" mb="1rem" borderBottom="1px" fontStyle="italic" mt="4rem">Games</Heading>
             <Grid templateColumns="repeat(2, 1fr)" gap={5} >
@@ -47,5 +50,20 @@ const Profile = () => {
         </>
     );
 }
+
+export async function getServerSideProps(){
+    await connectMongoose()
+    console.log("connected")
+    
+    const f = await users.findOne({name : "unko zaemon"})
+    const s = JSON.stringify(f)
+    console.log(s)
+    return {
+        props : {
+            user : JSON.parse(JSON.stringify(f))
+        }
+    }
+}
+
 
 export default Profile;

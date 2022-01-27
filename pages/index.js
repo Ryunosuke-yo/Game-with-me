@@ -1,26 +1,14 @@
+import { AtSignIcon } from '@chakra-ui/icons'
 import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
 import Header from '../componets/Header'
 import Inputforsearch from '../componets/InputForSearch'
-import { initFirebase } from '../firebase/initFirebase'
+import {signIn, useSession, signOut} from "next-auth/react"
 
-import ReadData from "../componets/firestore/read"
-import WriteData from "../componets/firestore/write"
-import FirebaseAuthComp from  "../componets/auth/firebaseAuth"
-import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth"
-import { getUserFromCookies, setUserCookie } from '../firebase/useCookies'
-import { useState } from 'react'
+
+
 
 export default function Home() {
-  const [cookie, setCookies] = useState()
-  if(cookie){
-    const coo = getUserFromCookies()
-    setCookies(coo)
-    setUserCookie(coo)
-  } else {
-    console.log("no cookies")
-  }
+  const {data : session} = useSession()
   return (
     <div>
       <Head>
@@ -31,10 +19,18 @@ export default function Home() {
 
       <main>
         <Header />
-        <FirebaseAuthComp />
+        
         <Inputforsearch />
-        <WriteData />
-        <ReadData />
+
+        <a href={'/api/auth/signin'} onClick={(e)=>{
+          e.preventDefault()
+          signIn()
+        }}>signIn</a>
+        <a onClick={()=>signOut()}>out</a>
+
+
+
+       {session ? <div>{session.user.name}</div> : null}
       </main>
     </div>
   )
