@@ -1,7 +1,6 @@
 import NextAuth from "next-auth"
 import GithubProvider from "next-auth/providers/github"
 import {MongoDBAdapter} from "@next-auth/mongodb-adapter"
-import {connectMongoose, users} from "../../../lib/mongodb"
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { MongoClient } from "mongodb";
 
@@ -26,9 +25,6 @@ export default NextAuth ({
                 const user = await colle.findOne({
                     name : credentials.name
                 })
-
-                
-
                 if(user){
                     return user
                 } else {
@@ -37,5 +33,4 @@ export default NextAuth ({
               }
         })
     ],
-    // adapter : MongoDBAdapter(connectMongoose)
 })

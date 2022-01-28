@@ -3,6 +3,7 @@ import Head from 'next/head'
 import Header from '../componets/Header'
 import Inputforsearch from '../componets/InputForSearch'
 import {signIn, useSession, signOut} from "next-auth/react"
+import SignUpForm from '../componets/signUpForm'
 
 
 
@@ -19,7 +20,7 @@ export default function Home() {
 
       <main>
         <Header />
-        
+        <SignUpForm />
         <Inputforsearch />
 
         <a href={'/api/auth/signin'} onClick={(e)=>{
