@@ -24,30 +24,16 @@ const schema = yup.object().shape({
     name : yup.string().required(reqMessage).max(20, "20 characters maximum"),
     email : yup.string().email("Not valid email address").required(reqMessage),
     password : yup.string().required(reqMessage).min(5, "Password should be more than 5 characters").max(20, "Password should be less than 20 characters"),
-    pic : yup.mixed()
 }).required()
 
-const SignUpForm=()=> {
-    const fileNameRef = useRef(null)
-    const [fileUploaded, setFileUploaded] = useState()
-    // const handleFileName = (e)=>{
-        
-    //     const path = e.current.value
-    //     const fName = path.split("\\").reverse()[0]
-    //     console.log(fName)
-    //     setFileName(fName)
-    // }
-
-    const fileHandler = (e)=>{
-        setFileUploaded(e.target.files[0])
-    }
-
+const SignUpForm=()=> { 
     const {register, handleSubmit, formState : {errors}} = useForm({
         resolver : yupResolver(schema)
     })
     const onSubmit = data =>{
         console.log(data)
-        axios.post("/api/postuser", data)
+        
+         axios.post("/api/postuser", data)
         .then(function (response) {
             console.log(response);
           })
@@ -104,17 +90,17 @@ const SignUpForm=()=> {
                         <Input id="games" type="games"/>
                     </FormControl>
 
-                    <FormControl>
+                    {/* <FormControl>
                         <FormLabel htmlFor='pic' borderBottom="1px" textAlign="center">
                         Upload profile pic
                         </FormLabel>
                         <Center>
                         <label className='italic' onChange={fileHandler}>
                             {fileUploaded ? `${fileUploaded.name}` : "Choose a pic file"}
-                            <input id="pic" type="file" className='hidden' accept="image/png, image/gif, image/jpeg" ref={fileNameRef}  {...register("pic")}/>
+                            <input id="theFiles" type="file" className='hidden' accept="image/png, image/gif, image/jpeg" ref={fileNameRef}  {...register("theFiles")}/>
                         </label>
                         </Center>
-                    </FormControl>
+                    </FormControl> */}
                     <Center mt="2rem">
                         <Button type="submit" textAlign="center">Submit</Button>
                     </Center>

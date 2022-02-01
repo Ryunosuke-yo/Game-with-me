@@ -1,10 +1,10 @@
 
 import mongoose from "mongoose"
 import multer from "multer"
-import { flushSync } from "react-dom"
+
 import {connectMongoose, myModel} from "../../lib/mongodb"
 
-const 
+
 
 export default async (req, res)=> {
     // await mongoose.connect(process.env.MONGODB_URI)
@@ -19,9 +19,6 @@ export default async (req, res)=> {
             name : req.body.name,
             email : req.body.email,
             password : req.body.password,
-            pic : {
-                data : fs.readFileSync(path.join(__dirname + '/uploads/' + req.file.filename))
-            }
         });
 
         await doc.save()
@@ -29,3 +26,54 @@ export default async (req, res)=> {
         res.send("Posted")
     } 
 }
+
+// const upload = multer({
+//     storage : multer.diskStorage({
+//         destination : "./public/uploads",
+//         filename : (req, file, cb)=>cb(null, file.originalname)
+//     })
+// })
+
+// const middleware = upload.array("theFiles")
+
+// const handler = nextConnect({
+//     onNoMatch(req, res) {
+//         res.status(405).json(({error : `${req.method} not allowed`}))
+//     },
+// })
+// handler.use(middleware)
+
+// handler.post(async (req, res)=>{
+//     await connectMongoose()
+//     console.log(req.body)
+//     const doc = new myModel({
+//                     name : req.body.name,
+//                     email : req.body.email,
+//                     password : req.body.password,
+//                     pic : {
+//                         data: fs.readFileSync(path.join(__dirname + '/public/uploads/' + req.file.filename)),
+//                         contentType: 'image/png'
+//                     }
+//                 });
+                
+
+//         await doc.save()
+// })
+
+
+// const handler = nextConnect()
+// handler.use(middleware)
+
+// handler.post(async (req, res)=>{
+//     console.log("aaa")
+//     console.log(req.body)
+//     console.log(req.files)
+// })
+
+// export const config = {
+//     api: {
+//       bodyParser: false,
+//     },
+//   };
+
+// export default handler
