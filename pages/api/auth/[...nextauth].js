@@ -7,13 +7,14 @@ import { MongoClient } from "mongodb";
 
 export default NextAuth ({
     providers : [
-        GithubProvider({
-            clientId : process.env.GITHUB_ID,
-            clientSecret : process.env.GITHUB_SECRET,           
-        }),
+        // GithubProvider({
+        //     clientId : process.env.GITHUB_ID,
+        //     clientSecret : process.env.GITHUB_SECRET,           
+        // }),
         CredentialsProvider({
             credentials: {
-                name: { label: "name", type: "text"},
+                email: { label: "email", type: "text"},
+                password : {label : "password", type : "text"}
               },
               async authorize(credentials, req){
                 const db = await MongoClient.connect(process.env.MONGODB_URI, {
@@ -23,7 +24,8 @@ export default NextAuth ({
 
                 const colle = db.db().collection("users")
                 const user = await colle.findOne({
-                    name : credentials.name
+                    email : credentials.email,
+                    password : credentials.password
                 })
                 if(user){
                     return user

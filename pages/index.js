@@ -4,12 +4,22 @@ import Header from '../componets/Header'
 import Inputforsearch from '../componets/InputForSearch'
 import {signIn, useSession, signOut} from "next-auth/react"
 import SignUpForm from '../componets/signUpForm'
+import { SignOut, SignIn } from '../componets/signInOut'
+import { Center, Text, VStack } from '@chakra-ui/react'
+import SignedInSuc from '../componets/signedInSuc'
 
 
 
 
+const signInUpComp = <>
+
+
+</>
 export default function Home() {
   const {data : session} = useSession()
+  if(session){
+    console.log(session.user)
+  }
   return (
     <div>
       <Head>
@@ -20,18 +30,17 @@ export default function Home() {
 
       <main>
         <Header />
+        {session ? <SignedInSuc name={session.user.name} /> : 
+        <>
         <SignUpForm />
+        <SignIn />
+        </>
+        }
         <Inputforsearch />
 
-        <a href={'/api/auth/signin'} onClick={(e)=>{
-          e.preventDefault()
-          signIn()
-        }}>signIn</a>
-        <a onClick={()=>signOut()}>out</a>
 
 
 
-       {session ? <div>{session.user.name}</div> : null}
       </main>
     </div>
   )
