@@ -1,8 +1,6 @@
 import {
     FormControl,
     FormLabel,
-    FormErrorMessage,
-    FormHelperText,
     Input,
     Center,
     VStack,
@@ -15,7 +13,6 @@ import {
     Tag,
     TagLabel,
     TagCloseButton,
-    HStack,
     Grid
   } from '@chakra-ui/react'
 
@@ -25,6 +22,7 @@ import * as yup from "yup"
 import axios from 'axios'
 import { useCallback, useRef, useState } from 'react'
 import { AddIcon } from '@chakra-ui/icons'
+import { useRouter } from 'next/router'
 
 const reqMessage = "This field is required"
 
@@ -39,7 +37,7 @@ const SignUpForm=()=> {
     const {register, handleSubmit, formState : {errors}} = useForm({
         resolver : yupResolver(schema)
     })
-
+    const router = useRouter()
     const [gameArr, setGameArr] = useState([])
     const gameInpRef = useRef(null)
 
@@ -56,7 +54,7 @@ const SignUpForm=()=> {
 
 
     
-    const renderGameTags = gameArr.map((game)=>
+    const renderGameTags = gameArr.map((game, i)=>
     {
         const colorSchemes = ["red", "cyan", "blue", "green", "teal", "purple", "pink"]
         const randomIndex = Math.floor(Math.random() * colorSchemes.length) + 1;
@@ -65,7 +63,7 @@ const SignUpForm=()=> {
 
 
         return (
-            <Tag size="md" borderRadius='full' variant='outline' colorScheme={colorSchemes[randomIndex]}>
+            <Tag size="md" borderRadius='full' variant='outline' colorScheme={colorSchemes[randomIndex]} key={i}>
                 <Flex align="center"  direction="row" w="100% " justifyContent="space-between" >
                     <TagLabel>{game}</TagLabel>
                     <TagCloseButton />
@@ -73,6 +71,10 @@ const SignUpForm=()=> {
             </Tag>
             )}
     )
+
+    const testR = ()=>{
+        router.push("/login")
+    }
     
     const onSubmit = data =>{
         console.log(data)
@@ -80,10 +82,12 @@ const SignUpForm=()=> {
          axios.post("/api/postuser", data)
         .then(function (response) {
             console.log(response);
-          })
-          .catch(function (error) {
+            router.push("/api/auth/signin")
+            
+        })
+        .catch(function (error) {
             console.log(error);
-          });
+        });
         
     }
 
@@ -154,8 +158,6 @@ const SignUpForm=()=> {
                     <Center mt="2rem">
                         <Button type="submit" textAlign="center">Submit</Button>
                     </Center>
-
-
                     </form>
                 </VStack>
             </Center>
