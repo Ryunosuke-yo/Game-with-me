@@ -8,15 +8,23 @@ import {
     VStack,
     Text,
     Heading,
-    Button
+    Button,
+    Flex,
+    InputRightElement,
+    InputGroup,
+    Tag,
+    TagLabel,
+    TagCloseButton,
+    HStack,
+    Grid
   } from '@chakra-ui/react'
 
 import { useForm } from 'react-hook-form'
 import {yupResolver} from "@hookform/resolvers/yup"
 import * as yup from "yup"
 import axios from 'axios'
-import { useRef, useState } from 'react'
-import { set } from 'mongoose'
+import { useCallback, useRef, useState } from 'react'
+import { AddIcon } from '@chakra-ui/icons'
 
 const reqMessage = "This field is required"
 
@@ -24,15 +32,51 @@ const schema = yup.object().shape({
     name : yup.string().required(reqMessage).max(20, "20 characters maximum"),
     email : yup.string().email("Not valid email address").required(reqMessage),
     password : yup.string().required(reqMessage).min(5, "Password should be more than 5 characters").max(20, "Password should be less than 20 characters"),
+    profile : yup.string()
 }).required()
 
 const SignUpForm=()=> { 
     const {register, handleSubmit, formState : {errors}} = useForm({
         resolver : yupResolver(schema)
     })
+
+    const [gameArr, setGameArr] = useState([])
+    const gameInpRef = useRef(null)
+
+    const handleGameClick = useCallback(()=>{
+        const val = gameInpRef.current.value
+
+       setGameArr([
+           ...gameArr,
+           val
+       ])
+        console.log(gameArr)
+        
+    })
+
+
+    
+    const renderGameTags = gameArr.map((game)=>
+    {
+        const colorSchemes = ["red", "cyan", "blue", "green", "teal", "purple", "pink"]
+        const randomIndex = Math.floor(Math.random() * colorSchemes.length) + 1;
+
+
+
+
+        return (
+            <Tag size="md" borderRadius='full' variant='outline' colorScheme={colorSchemes[randomIndex]}>
+                <Flex align="center"  direction="row" w="100% " justifyContent="space-between" >
+                    <TagLabel>{game}</TagLabel>
+                    <TagCloseButton />
+                </Flex>
+            </Tag>
+            )}
+    )
+    
     const onSubmit = data =>{
         console.log(data)
-        
+        data.games = gameArr
          axios.post("/api/postuser", data)
         .then(function (response) {
             console.log(response);
@@ -80,16 +124,22 @@ const SignUpForm=()=> {
                         <FormLabel htmlFor='profile'borderBottom="1px" textAlign="center">
                         Profile
                         </FormLabel>
-                        <Input id="profile" type="profile"/>
+                        <Input id="profile" type="profile" />
                     </FormControl>
 
                     <FormControl>
                         <FormLabel htmlFor='games' borderBottom="1px" textAlign="center">
                         Games
                         </FormLabel>
-                        <Input id="games" type="games"/>
+                        <InputGroup>
+                        <InputRightElement children={<AddIcon onClick={handleGameClick} />}/>
+                        <Input id="games" type="games" ref={gameInpRef} />
+                        </InputGroup>
+                        <Grid mt="1rem" templateColumns='repeat(3, 1fr)' gap="1em" >
+                        {renderGameTags}
+                        </Grid>
                     </FormControl>
-
+                        
                     {/* <FormControl>
                         <FormLabel htmlFor='pic' borderBottom="1px" textAlign="center">
                         Upload profile pic

@@ -19,6 +19,8 @@ export default async (req, res)=> {
             name : req.body.name,
             email : req.body.email,
             password : req.body.password,
+            profile : req.body.profile,
+            games : req.body.games
         });
 
         await doc.save()
