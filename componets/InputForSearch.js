@@ -1,9 +1,15 @@
-import {Center, Input} from "@chakra-ui/react"
+import {Center, Input, VStack} from "@chakra-ui/react"
+import { useState } from "react";
 
-const Inputforsearch = () => {
+const Inputforsearch = ({handleNameInput}) => {
+
+    
     return (
         <Center mb="2rem" mt="2rem">
-        <Input placeholder="type keyword" w="80%"/>
+        <VStack w="90%" spacing="7">
+        <Input placeholder="Search by username" w="80%" onChange={handleNameInput}/>
+        {/* <Input placeholder="Search by games" w="80%" onChange={handleGameInput}/> */}
+        </VStack>
         </Center>
     );
 }

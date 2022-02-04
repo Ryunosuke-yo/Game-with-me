@@ -1,4 +1,4 @@
-import {client, connectMongoose, Schema, createModel, model, userS, userModel, user} from "../../lib/mongodb"
+import {connectMongoose,myModel} from "../../lib/mongodb"
 
 
 export default async  (req, res)=>{
@@ -8,7 +8,7 @@ export default async  (req, res)=>{
     
    
     
-    const docs = await user.find({})
+    const docs = await myModel.find({})
 
     res.json(docs)
 }

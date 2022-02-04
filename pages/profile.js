@@ -1,21 +1,24 @@
 import Header from "../componets/Header";
 import { Center, HStack, Image, Text, VStack, Flex, Avatar, Box, Badge, Grid, Heading } from "@chakra-ui/react";
-import Games from "../componets/profile/games";
-import Footer from "../componets/Footer";
-import {connectMongoose} from "../lib/mongodb"
-import users from "../lib/mongodb";
+import { useContext } from "react";
+import { UserContext } from "./_app";
 
 
 
-const Profile = ({user}) => {
+const Profile = () => {
 
 
     
-    const gameLIst = ["Apex legends", "popo no boken", "monster Hundter", "GOd of War", "Shadow verse"]
+    // const gameLIst = ["Apex legends", "popo no boken", "monster Hundter", "GOd of War", "Shadow verse"]
 
-    const renderGames = user.games.map(el=><Games title={el}/>)
-
-
+    // const renderGames = user.games.map(el=><Games title={el}/>)
+    const userData = useContext(UserContext)
+    
+    if(userData){
+        console.log(userData)
+      } else {
+          console.log("nasi")
+      }
     return (
         <>
         <Header />
@@ -30,11 +33,11 @@ const Profile = ({user}) => {
         </Center>
 
         <VStack mt="3rem" spacing="3rem" mb="4rem">
-            <Text borderBottom="1px">{user.name}</Text>
+            <Text borderBottom="1px">Tanomu kitekure</Text>
             <Text borderBottom="1px">Age  : 106</Text>
             <Heading as="h1" fontWeight="lighter"  fontSize="2rem" mb="1rem" borderBottom="1px" fontStyle="italic" mt="4rem">Games</Heading>
             <Grid templateColumns="repeat(2, 1fr)" gap={5} >
-            {renderGames}
+            {/* {renderGames} */}
             </Grid>
             <Center>
                 <VStack>
@@ -51,19 +54,19 @@ const Profile = ({user}) => {
     );
 }
 
-export async function getServerSideProps(){
-    await connectMongoose()
-    console.log("connected")
+// export async function getServerSideProps(){
+//     await connectMongoose()
+//     console.log("connected")
     
-    const f = await users.findOne({name : "unko zaemon"})
-    const s = JSON.stringify(f)
-    console.log(s)
-    return {
-        props : {
-            user : JSON.parse(JSON.stringify(f))
-        }
-    }
-}
+//     const f = await users.findOne({name : "unko zaemon"})
+//     const s = JSON.stringify(f)
+//     console.log(s)
+//     return {
+//         props : {
+//             user : JSON.parse(JSON.stringify(f))
+//         }
+//     }
+// }
 
 
 export default Profile;
