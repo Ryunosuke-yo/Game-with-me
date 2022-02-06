@@ -1,10 +1,13 @@
 
 import mongoose from "mongoose"
-import multer from "multer"
 
 import {connectMongoose, myModel} from "../../lib/mongodb"
 
 
+
+const upload = multer({
+    storage : multer.memoryStorage()
+})
 
 export default async (req, res)=> {
     // await mongoose.connect(process.env.MONGODB_URI)
@@ -12,15 +15,16 @@ export default async (req, res)=> {
     connectMongoose()
     if (req.method === "POST") {
         console.log("post")
+        console.log(req)
 
-        console.log(req.body)
+
 
         const doc = new myModel({
             name : req.body.name,
             email : req.body.email,
             password : req.body.password,
             profile : req.body.profile,
-            games : req.body.games
+            games : req.body.games,
         });
 
         await doc.save()

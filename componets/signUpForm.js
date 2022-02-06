@@ -40,6 +40,7 @@ const SignUpForm=()=> {
     const router = useRouter()
     const [gameArr, setGameArr] = useState([])
     const gameInpRef = useRef(null)
+    const fileRef = useRef(null)
 
     const handleGameClick = useCallback(()=>{
         const val = gameInpRef.current.value
@@ -75,6 +76,8 @@ const SignUpForm=()=> {
     const testR = ()=>{
         router.push("/login")
     }
+
+   
     
     const onSubmit = data =>{
         console.log(data)
@@ -149,9 +152,9 @@ const SignUpForm=()=> {
                         Upload profile pic
                         </FormLabel>
                         <Center>
-                        <label className='italic' onChange={fileHandler}>
-                            {fileUploaded ? `${fileUploaded.name}` : "Choose a pic file"}
-                            <input id="theFiles" type="file" className='hidden' accept="image/png, image/gif, image/jpeg" ref={fileNameRef}  {...register("theFiles")}/>
+                        <label className='italic'  >
+                            {fileRef ? `${fileRef}` : "Choose a pic file"}
+                            <input id="theFiles" type="file" className='hidden' accept="image/png, image/gif, image/jpeg"  ref={fileRef} {...register("file")}/>
                         </label>
                         </Center>
                     </FormControl> */}

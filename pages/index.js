@@ -1,4 +1,4 @@
-import { AtSignIcon } from '@chakra-ui/icons'
+
 import Head from 'next/head'
 import Header from '../componets/Header'
 import Inputforsearch from '../componets/InputForSearch'
@@ -11,19 +11,22 @@ import { createContext, useCallback, useEffect } from 'react'
 import {connectMongoose, myModel} from "../lib/mongodb"
 import Users from '../componets/userSearch/users'
 import { useState } from 'react'
-import axios from 'axios'
+import {getSession} from "next-auth/react"
+
 
 
 export default function Home({user}) {
-  const {data : session} = useSession()
-  if(session){
-    console.log(session.user)
-  }
-  // console.log(user)
-  
-  const [searchInput, setSearchInput] = useState()
+  const {data : session , status} = useSession()
   const [searchedUser, setSearchedUser] = useState(null)
-    const [userData, setUserData] =useState(user)
+  const [userData, setUserData] =useState()
+
+
+  useEffect(()=>{
+    const loginFilterUsers = userData?.filter(u=>u.email != session?.user.email)
+    setSearchedUser(loginFilterUsers)
+    setUserData(loginFilterUsers)
+    console.log(session)
+  }, [session])
     
     const renderUsers = searchedUser ?  searchedUser.map(u=>
       <Users u = {u}/>
@@ -32,38 +35,23 @@ export default function Home({user}) {
       
       
       useEffect(()=>{
-        setSearchedUser(userData)
+        setUserData(session ? user.filter(u=>u.email != session?.user.email) : user)
+        setSearchedUser(user.filter(u=>u.email != session?.user.email))
       },[])
+
 
     
   const handleNameInput = e =>{
-  //   setSearchInput(e.target.value)
-  //   console.log("call", searchInput)
 
-  //   axios.get("/api/users")
-  // .then((res)=>{
+            const filtered = userData.filter(user=>{
+            const isGamesIncludes = user.games.some((game)=>game.includes(e.target.value))
+            
+            return isGamesIncludes ? user : user.name.includes(e.target.value)
+            })
+            console.log(searchedUser)
+            setSearchedUser(filtered)
+        }
 
-  //   // console.log(searchedUser)
-    
-  // })
-  // .catch(err => {
-  //   console.error(err);
-  // });
-  const filtered = userData.filter(user=>{
-
-    const isGamesIncludes = user.games.some((game)=>game.includes(e.target.value))
-
-     return isGamesIncludes ? user : user.name.includes(e.target.value)
-}
-)
-  console.log(searchedUser)
-  setSearchedUser(filtered)
-}
-
-  const handleGameInput = ()=>{
-
-  }
-  
 
   return (
     <>
@@ -74,7 +62,7 @@ export default function Home({user}) {
       </Head>
 
       <main>
-        <Header />
+        <Header loggedIn={session}/>
         {session ? <SignedInSuc name={session.user.name} /> : 
         <>
         <SignUpForm />

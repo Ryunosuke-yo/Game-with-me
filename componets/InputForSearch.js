@@ -7,7 +7,7 @@ const Inputforsearch = ({handleNameInput}) => {
     return (
         <Center mb="2rem" mt="2rem">
         <VStack w="90%" spacing="7">
-        <Input placeholder="Search by username" w="80%" onChange={handleNameInput}/>
+        <Input placeholder="Type username or game" w="80%" onChange={handleNameInput}/>
         {/* <Input placeholder="Search by games" w="80%" onChange={handleGameInput}/> */}
         </VStack>
         </Center>

@@ -1,6 +1,7 @@
 import { Box, Text , Center, VStack} from "@chakra-ui/react"
 import {signIn, signOut} from "next-auth/react"
-import Link from "next/link"
+import {loggedInContext} from "../pages/index"
+
 
 
 
@@ -27,7 +28,10 @@ export function SignIn() {
         
 export function SignOut() {
             return (
-                <a onClick={()=>signOut()}>out</a>
+                <a onClick={()=>{
+                  signOut()
+                  loggedIn
+                }}>out</a>
                 
     )
 }

@@ -1,24 +1,67 @@
 import Header from "../componets/Header";
-import { Center, HStack, Image, Text, VStack, Flex, Avatar, Box, Badge, Grid, Heading } from "@chakra-ui/react";
-import { useContext } from "react";
-import { UserContext } from "./_app";
+import { Center, HStack, Image, Text, VStack, Flex, Grid, Heading , Tag, TagLabel, TagCloseButton, Button} from "@chakra-ui/react";
+import { useContext, useEffect, useState } from "react";
+import {  useSession, getSession } from "next-auth/react";
+import axios from "axios";
+import { render } from "react-dom";
+
+
 
 
 
 const Profile = () => {
+    // const [rawUser, setRawUSer] = useState([]) 
+    const [sessionUser, setSessionUser] = useState()
+    const [gamesToRender, setGamesToRender] = useState([])
+    const {data : session, status} = useSession()
+    const isAuthenticated = status === "authenticated"
 
+    console.log(session)
 
+    useEffect(()=>{
+        axios.get("/api/getauser")
+        .then(res=>{
+            console.log(res.data)
+            setGamesToRender(res.data)
+        })
+
+        // const get = async ()=>{
+        //     await connectMongoose()
+        //     const docs = await myModel.find({email : session?.user.email})
+
+        //     setGamesToRender(docs.games)
+        // }
+
+        // get()
+    },[])
     
-    // const gameLIst = ["Apex legends", "popo no boken", "monster Hundter", "GOd of War", "Shadow verse"]
-
-    // const renderGames = user.games.map(el=><Games title={el}/>)
-    const userData = useContext(UserContext)
+    if(isAuthenticated) {
+        console.log(session.user)
+    } else {
+        console.log("not authed")
+    }
+   
     
-    if(userData){
-        console.log(userData)
-      } else {
-          console.log("nasi")
-      }
+    const listOfGames = gamesToRender[0]?.games.map((game, i)=>
+       { 
+        const colorSchemes = ["red", "cyan", "blue", "green", "teal", "purple", "pink"]
+        const randomIndex = Math.floor(Math.random() * colorSchemes.length) + 1;
+
+
+       return(<Tag size="md" borderRadius='full' variant='outline' colorScheme={colorSchemes[randomIndex]} key={i}>
+                <Flex align="center"  direction="row" w="100% " justifyContent="space-between" >
+                    <TagLabel>{game}</TagLabel>
+                    <TagCloseButton />
+                </Flex>
+            </Tag>)
+    }
+    )
+
+    // const listOfGames  = gamesToRender[0].games.map(game=><Text>{game}</Text>)
+    const getGames = ()=>{
+      
+        
+    }
     return (
         <>
         <Header />
@@ -33,17 +76,16 @@ const Profile = () => {
         </Center>
 
         <VStack mt="3rem" spacing="3rem" mb="4rem">
-            <Text borderBottom="1px">Tanomu kitekure</Text>
-            <Text borderBottom="1px">Age  : 106</Text>
-            <Heading as="h1" fontWeight="lighter"  fontSize="2rem" mb="1rem" borderBottom="1px" fontStyle="italic" mt="4rem">Games</Heading>
+            <Heading borderBottom="1px" fontSize="2rem" fontStyle="italic" fontWeight="lighter">{session.user.name}</Heading>
+            <Heading as="h1" fontWeight="lighter"  fontSize="2rem" mb="1rem" borderBottom="1px" fontStyle="italic" mt="4rem" onClick={getGames}>Games</Heading>
             <Grid templateColumns="repeat(2, 1fr)" gap={5} >
-            {/* {renderGames} */}
+            {listOfGames}
             </Grid>
             <Center>
                 <VStack>
                     <Heading as="h3" fontStyle="italic" fontWeight="lighter" borderBottom="1px">Profile</Heading>
                     <Text p="1.2rem" fontStyle="0.5rem">
-                    Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, 
+                   {/* {rawUser.profile} */}
                     </Text>
                 </VStack>
             </Center>
@@ -54,19 +96,21 @@ const Profile = () => {
     );
 }
 
-// export async function getServerSideProps(){
+// export async function getServerSideProps(req, res){
 //     await connectMongoose()
 //     console.log("connected")
+//     const session = await getSession({req})
+//     // const docs = await myModel.find({email : session.user.email})
+//     console.log(session)
     
-//     const f = await users.findOne({name : "unko zaemon"})
-//     const s = JSON.stringify(f)
-//     console.log(s)
+//     // res.send("a")
 //     return {
 //         props : {
-//             user : JSON.parse(JSON.stringify(f))
+//             rawUser : "a"
 //         }
 //     }
 // }
+
 
 
 export default Profile;
