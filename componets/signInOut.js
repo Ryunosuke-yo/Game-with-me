@@ -30,7 +30,6 @@ export function SignOut() {
             return (
                 <a onClick={()=>{
                   signOut()
-                  loggedIn
                 }}>out</a>
                 
     )
