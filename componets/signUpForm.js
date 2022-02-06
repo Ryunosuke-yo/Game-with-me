@@ -33,7 +33,7 @@ const schema = yup.object().shape({
     profile : yup.string()
 }).required()
 
-const SignUpForm=()=> { 
+const SignUpForm=({toggleForm})=> { 
     const {register, handleSubmit, formState : {errors}} = useForm({
         resolver : yupResolver(schema)
     })
@@ -162,6 +162,7 @@ const SignUpForm=()=> {
                         <Button type="submit" textAlign="center">Submit</Button>
                     </Center>
                     </form>
+                    {toggleForm ?   <Text onClick={toggleForm}>close</Text>:null}
                 </VStack>
             </Center>
      </>

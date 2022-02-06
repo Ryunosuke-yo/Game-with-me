@@ -12,6 +12,7 @@ import {connectMongoose, myModel} from "../lib/mongodb"
 import Users from '../componets/userSearch/users'
 import { useState } from 'react'
 import {getSession} from "next-auth/react"
+import SignUpButton from '../componets/signUpButton'
 
 
 
@@ -19,6 +20,7 @@ export default function Home({user}) {
   const {data : session , status} = useSession()
   const [searchedUser, setSearchedUser] = useState(null)
   const [userData, setUserData] =useState()
+  const [showSignUp, setShowSignUp] = useState(false)
 
 
   useEffect(()=>{
@@ -52,7 +54,7 @@ export default function Home({user}) {
             setSearchedUser(filtered)
         }
 
-
+const toggleForm = ()=>{setShowSignUp(prev=> !prev)}
   return (
     <>
       <Head>
@@ -65,7 +67,8 @@ export default function Home({user}) {
         <Header loggedIn={session}/>
         {session ? <SignedInSuc name={session.user.name} /> : 
         <>
-        <SignUpForm />
+        {showSignUp ? <SignUpForm toggleForm={toggleForm}/> :<SignUpButton toggleForm={toggleForm}/>}
+        
         <SignIn />
         </>
         }

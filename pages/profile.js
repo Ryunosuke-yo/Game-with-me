@@ -49,9 +49,8 @@ const Profile = () => {
 
 
        return(<Tag size="md" borderRadius='full' variant='outline' colorScheme={colorSchemes[randomIndex]} key={i}>
-                <Flex align="center"  direction="row" w="100% " justifyContent="space-between" >
+                <Flex align="center"  direction="row" w="100% " justifyContent="center" >
                     <TagLabel>{game}</TagLabel>
-                    <TagCloseButton />
                 </Flex>
             </Tag>)
     }
