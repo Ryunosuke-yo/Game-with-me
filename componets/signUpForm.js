@@ -69,9 +69,6 @@ const SignUpForm=({toggleForm})=> {
         const colorSchemes = ["red", "cyan", "blue", "green", "teal", "purple", "pink"]
         const randomIndex = Math.floor(Math.random() * colorSchemes.length) + 1;
 
-
-
-
         return (
             <Tag size="md" borderRadius='full' variant='outline' colorScheme={colorSchemes[randomIndex]} key={i}>
                 <Flex align="center"  direction="row" w="100% " justifyContent="space-between" >
