@@ -33,6 +33,9 @@ const schema = yup.object().shape({
     profile : yup.string()
 }).required()
 
+
+
+
 const SignUpForm=({toggleForm})=> { 
     const {register, handleSubmit, formState : {errors}} = useForm({
         resolver : yupResolver(schema)
@@ -40,11 +43,13 @@ const SignUpForm=({toggleForm})=> {
     const router = useRouter()
     const [gameArr, setGameArr] = useState([])
     const gameInpRef = useRef(null)
-    const fileRef = useRef(null)
+    const [file, setFile] = useState()
+    const axiosConfig = {
+        headers : { 'content-type': 'multipart/form-data'  }
+    }
 
     const handleGameClick = useCallback(()=>{
         const val = gameInpRef.current.value
-
        setGameArr([
            ...gameArr,
            val
@@ -52,6 +57,10 @@ const SignUpForm=({toggleForm})=> {
         console.log(gameArr)
         
     })
+
+    const handleFile = (e)=>{
+        setFile(e.target.files[0])
+    }
 
 
     
@@ -79,7 +88,8 @@ const SignUpForm=({toggleForm})=> {
 
    
     
-    const onSubmit = data =>{
+    const onSubmit = async data =>{
+        console.log(data.file[0])
         console.log(data)
         data.games = gameArr
          axios.post("/api/postuser", data)
@@ -91,6 +101,18 @@ const SignUpForm=({toggleForm})=> {
         .catch(function (error) {
             console.log(error);
         });
+
+        
+
+        // const formData = new FormData()
+        // formData.append("name", data.name)
+        // formData.append("email", data.email)
+        // formData.append("password", data.password)
+        // formData.append("profile", data.profile)
+        // formData.append("games", gameArr)
+        // formData.append('file', data.file[0])
+
+        // await axios.post("/api/postuser", formData, axiosConfig)
         
     }
 
@@ -131,7 +153,7 @@ const SignUpForm=({toggleForm})=> {
                         <FormLabel htmlFor='profile'borderBottom="1px" textAlign="center">
                         Profile
                         </FormLabel>
-                        <Input id="profile" type="profile" />
+                        <Input id="profile" type="profile" {...register("profile")}/>
                     </FormControl>
 
                     <FormControl>
@@ -147,17 +169,17 @@ const SignUpForm=({toggleForm})=> {
                         </Grid>
                     </FormControl>
                         
-                    {/* <FormControl>
-                        <FormLabel htmlFor='pic' borderBottom="1px" textAlign="center">
+                    <FormControl>
+                        <FormLabel htmlFor='file' borderBottom="1px" textAlign="center">
                         Upload profile pic
                         </FormLabel>
                         <Center>
-                        <label className='italic'  >
-                            {fileRef ? `${fileRef}` : "Choose a pic file"}
-                            <input id="theFiles" type="file" className='hidden' accept="image/png, image/gif, image/jpeg"  ref={fileRef} {...register("file")}/>
+                        <label className='italic' onChange={handleFile}>
+                            {file?.name ? `${file.name}` : "Choose a pic file"}
+                            <input id="file" type="file" className='hidden' accept="image/png, image/gif, image/jpeg" {...register("file")}/>
                         </label>
                         </Center>
-                    </FormControl> */}
+                    </FormControl>
                     <Center mt="2rem">
                         <Button type="submit" textAlign="center">Submit</Button>
                     </Center>

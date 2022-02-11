@@ -1,46 +1,37 @@
-
-import mongoose from "mongoose"
+import nextConnect from "next-connect"
+import multer from "multer";
 
 import {connectMongoose, myModel} from "../../lib/mongodb"
 
 
 
-const upload = multer({
-    storage : multer.memoryStorage()
-})
 
-export default async (req, res)=> {
-    // await mongoose.connect(process.env.MONGODB_URI)
+export default async function(req, res){
+    await connectMongoose()
+    const userData = req.body
 
-    connectMongoose()
-    if (req.method === "POST") {
-        console.log("post")
-        console.log(req)
+    const doc = new myModel({
+        name : userData.name,
+        email : userData.email,
+        password : userData.password,
+        games : userData.games,
+        profile : userData.profile
+    })
 
-
-
-        const doc = new myModel({
-            name : req.body.name,
-            email : req.body.email,
-            password : req.body.password,
-            profile : req.body.profile,
-            games : req.body.games,
-        });
-
-        await doc.save()
-
-        res.send("Posted")
-    } 
+    await doc.save()
 }
 
-// const upload = multer({
-//     storage : multer.diskStorage({
-//         destination : "./public/uploads",
-//         filename : (req, file, cb)=>cb(null, file.originalname)
-//     })
-// })
+// export const config = {
+//     api: {
+//       bodyParser: false,
+//     },
+//   };
 
-// const middleware = upload.array("theFiles")
+
+// const upload = multer({
+//     storage : multer.memoryStorage()
+// })
+// const middleware = upload.single("file")
 
 // const handler = nextConnect({
 //     onNoMatch(req, res) {
@@ -56,10 +47,9 @@ export default async (req, res)=> {
 //                     name : req.body.name,
 //                     email : req.body.email,
 //                     password : req.body.password,
-//                     pic : {
-//                         data: fs.readFileSync(path.join(__dirname + '/public/uploads/' + req.file.filename)),
-//                         contentType: 'image/png'
-//                     }
+//                     profile : req.body.profile,
+//                     games : req.body.games,
+//                     file : req.file
 //                 });
                 
 
@@ -76,10 +66,6 @@ export default async (req, res)=> {
 //     console.log(req.files)
 // })
 
-// export const config = {
-//     api: {
-//       bodyParser: false,
-//     },
-//   };
+
 
 // export default handler
