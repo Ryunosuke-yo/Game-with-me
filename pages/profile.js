@@ -17,7 +17,7 @@ const Profile = ({test}) => {
     const [userFromDatabase, setUserFromDatabase] = useState([])
     const {data : session, status} = useSession()
     const fileRef = useRef(null)
-    const [fileData, setFileData] = useState()
+    const [fileData, setFileData] = useState() 
     const [fileName, setFileName] = useState()
     const isAuthenticated = status === "authenticated"
     const [imgBuffer, setImgBuffer] = useState()
@@ -29,26 +29,17 @@ const Profile = ({test}) => {
     const {register, handleSubmit, formState : {errors}} = useForm()
 
     const onSubmit = async data => {
-        // const formData = new FormData()
-        // formData.append('file', fileName)
-        // formData.append("name", data.name)
-        // formData.append('emailToUpdate', session.user.email)
         data.emailToUpdate = session.user.email
+        const formData = new FormData()
+        formData.append('file', fileName)
+        formData.append('email', session.user.email)
         console.log(data)
         try {
             await axios.post('/api/update', data)
+            await axios.post('/api/postimg', formData, axiosConfig)
         } catch (error) {
             console.log(error.response.data)
         }
-
-        // try {
-        //     await axios.post('/api/update', data, axiosConfig)
-        // } catch (error) {
-        //     console.log(error.response.data)
-        // }
-        
-        
-
     }
 
     const arrayBufferToBase64=(buffer)=> {
@@ -129,32 +120,35 @@ const Profile = ({test}) => {
     <>
     <Center mt='2rem' mb='8rem'>
     <VStack spacing='2rem'>
-    <FormControl>
-    <FormLabel htmlFor="name" textAlign='center' fontStyle='italic'>Name</FormLabel>
-    <Input placeholder={userFromDatabase.name} id='name' variant='flushed' fontStyle='italic' fontWeight="lighter"/>
-    </FormControl>
 
-    <FormControl>
-    <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >email</FormLabel>
-    <Input variant='flushed' placeholder={userFromDatabase.email} id='email' variant='flushed' fontStyle='italic' fontWeight="lighter"/>
-    </FormControl>
+    <form onSubmit={handleSubmit(onSubmit)}>
+        <FormControl>
+        <FormLabel htmlFor="name" textAlign='center' fontStyle='italic'>Name</FormLabel>
+        <Input placeholder={userFromDatabase.name} id='name' variant='flushed' fontStyle='italic' fontWeight="lighter" {...register("name")}/>
+        </FormControl>
 
-    <FormControl>
-    <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >games</FormLabel>
-    <InputGroup>
-    <Input variant='flushed' placeholder='edit your games' id='games' variant='flushed' fontStyle='italic' fontWeight="lighter"/>
-    <InputRightElement children={<AddIcon />}/>
-    </InputGroup>
-    <Grid mt="1rem" templateColumns='repeat(3, 1fr)' gap="1em" >
-    {renderGameTags}
-    </Grid>
-    </FormControl>
+        <FormControl>
+        <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >email</FormLabel>
+        <Input variant='flushed' placeholder={userFromDatabase.email} id='email' variant='flushed' fontStyle='italic' fontWeight="lighter" {...register("email")}/>
+        </FormControl>
 
-    <FormControl>
-    <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >profile</FormLabel>
-    <Input variant='flushed' placeholder={userFromDatabase.profile} id='profile' variant='flushed' fontStyle='italic' fontWeight="lighter"/>
-    </FormControl>
+        <FormControl>
+        <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >games</FormLabel>
+        <InputGroup>
+        <Input variant='flushed' placeholder='edit your games' id='games' variant='flushed' fontStyle='italic' fontWeight="lighter"/>
+        <InputRightElement children={<AddIcon />}/>
+        </InputGroup>
+        <Grid mt="1rem" templateColumns='repeat(3, 1fr)' gap="1em" >
+        {renderGameTags}
+        </Grid>
+        </FormControl>
 
+        <FormControl>
+        <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >profile</FormLabel>
+        <Input variant='flushed' placeholder={userFromDatabase.profile} id='profile' variant='flushed' fontStyle='italic' fontWeight="lighter" {...register("profile")}/>
+        </FormControl>
+        <Button type="submit">Update</Button>
+    </form>
 
     </VStack>
     </Center>
