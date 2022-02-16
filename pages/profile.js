@@ -22,6 +22,7 @@ const Profile = ({test}) => {
     const isAuthenticated = status === "authenticated"
     const [imgBuffer, setImgBuffer] = useState()
     const [inputField, setInputFiled] = useState(false)
+    const [userPIc, setUserPic] = useState()
     const axiosConfig = {
         headers : { 'content-type': 'multipart/form-data'  }
     }
@@ -35,8 +36,9 @@ const Profile = ({test}) => {
         formData.append('email', session.user.email)
         console.log(data)
         try {
-            await axios.post('/api/update', data)
-            await axios.post('/api/postimg', formData, axiosConfig)
+            const updateUser = axios.post('/api/update', data)
+            const postImg = axios.post('/api/postimg', formData, axiosConfig)
+            const res = await Promise.all([updateUser,postImg])
         } catch (error) {
             console.log(error.response.data)
         }
@@ -68,14 +70,15 @@ const Profile = ({test}) => {
 
     // console.log(session)
 
-    useEffect(()=>{
-        axios.get("/api/getauser", {params : session?.user.email})
-        .then(res=>{
-            console.log(res.data)
-            setUserFromDatabase(res.data[0])
-        })
+    useEffect(async ()=>{
+        const getUser = axios.get("/api/getauser", {params : session?.user.email})
+        const getPic = axios.get("/api/getpic", {params : session?.user.email})
+        const res = await Promise.all([getUser, getPic])
+        setUserFromDatabase(res[0].data[0])
+        console.log(res)
 
-        // setImgBuffer('data:image/png;base64,' + arrayBufferToBase64(test.img?.data.data))
+
+        setImgBuffer('data:image/png;base64,' + arrayBufferToBase64(res[1].data[0].img.data.data))
         // console.log(imgBuffer)
     },[])
     
