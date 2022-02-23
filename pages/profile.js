@@ -6,6 +6,7 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useRef } from "react";
 import { EditIcon,  AddIcon} from "@chakra-ui/icons";
+import Link from "next/link";
 
 
 
@@ -52,14 +53,14 @@ const Profile = ({test}) => {
     };
     const b = ()=>{
         // setImgBuffer('data:image/png;base64,' + arrayBufferToBase64(test.img.data))
-        console.log(imgBuffer)
-        console.log(test.name)
-        console.log(test)
+        // console.log(imgBuffer)
+        // console.log(test.name)
+        // console.log(test)
     }
     const handleFileName =(e)=>{
       
             setFileName(e.target.files[0])
-            console.log(e.target.files)
+            // console.log(e.target.files)
             // const formData = new FormData();
 
             //     Array.from(e.target.files).forEach((file) => {
@@ -78,14 +79,14 @@ const Profile = ({test}) => {
         console.log(res)
 
 
-        setImgBuffer('data:image/png;base64,' + arrayBufferToBase64(res[1].data[0].img.data.data))
+        setImgBuffer('data:image/png;base64,' + arrayBufferToBase64(res[1].data[0]?.img.data.data))
         // console.log(imgBuffer)
     },[])
     
     if(isAuthenticated) {
-        console.log(session.user)
+        // console.log(session.user)
     } else {
-        console.log("not authed")
+        // console.log("not authed")
     }
    
     
@@ -151,6 +152,9 @@ const Profile = ({test}) => {
         <Input variant='flushed' placeholder={userFromDatabase.profile} id='profile' variant='flushed' fontStyle='italic' fontWeight="lighter" {...register("profile")}/>
         </FormControl>
         <Button type="submit">Update</Button>
+        <Link href="/api/auth/[...nextauth]">
+            <a>sss</a>
+        </Link>
     </form>
 
     </VStack>
@@ -211,12 +215,7 @@ const Profile = ({test}) => {
         <Center>
         <Icon as={EditIcon} mt='1rem' onClick={()=>setInputFiled(prev=>!prev)}></Icon>
         </Center>
-       
             {inputField ? renderInputField : displayInfo}
-            
-       
-
-        
         </>
     );
 }
