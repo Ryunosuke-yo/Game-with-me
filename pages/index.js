@@ -5,53 +5,69 @@ import Inputforsearch from '../componets/InputForSearch'
 import {signIn, useSession, signOut} from "next-auth/react"
 import SignUpForm from '../componets/signUpForm'
 import { SignOut, SignIn } from '../componets/signInOut'
-import { Center, Text, VStack } from '@chakra-ui/react'
+import { Center, list, Text, VStack } from '@chakra-ui/react'
 import SignedInSuc from '../componets/signedInSuc'
 import { createContext, useCallback, useEffect } from 'react'
-import {connectMongoose, myModel} from "../lib/mongodb"
 import Users from '../componets/userSearch/users'
 import { useState } from 'react'
-import {getSession} from "next-auth/react"
 import SignUpButton from '../componets/signUpButton'
+import {db, initializeDB} from "../lib/firebase"
+import { collection, getDocs } from 'firebase/firestore/lite'
+import { getFirestore } from 'firebase/firestore/lite'
 
 
 
 export default function Home({user}) {
   const {data : session , status} = useSession()
   const [searchedUser, setSearchedUser] = useState(null)
-  const [userData, setUserData] =useState()
+  const [userData, setUserData] =useState(user)
   const [showSignUp, setShowSignUp] = useState(false)
-
-
-  useEffect(()=>{
-    const loginFilterUsers = userData?.filter(u=>u.email != session?.user.email)
-    setSearchedUser(loginFilterUsers)
-    setUserData(loginFilterUsers)
-    console.log(session)
-  }, [session])
+  
+  
+  
+  
+  // useEffect(()=>{
+    //   const loginFilterUsers = userData?.filter(u=>u.email != session?.user.email)
+    //   setSearchedUser(loginFilterUsers)
+    //   setUserData(loginFilterUsers)
+    //   console.log(session)
+    // }, [session])
     
-    const renderUsers = searchedUser ?  searchedUser.map(u=>
-      <Users u = {u}/>
-      ) : 
-      null
-      
-      
-      useEffect(()=>{
-        setUserData(session ? user.filter(u=>u.email != session?.user.email) : user)
-        setSearchedUser(user.filter(u=>u.email != session?.user.email))
-      },[])
+    
+    
+    useEffect(()=>{
+      initializeDB
+      const t = getFirestore(initializeDB)
+      const getUsers = async ()=>{
+      const userCol = collection(t, "user")
+      const userDocs = await getDocs(userCol)
+      const list = userDocs.docs.map(doc=>doc.data())
+      setSearchedUser(list)
+      setUserData(list)
+      console.log("ano useeffect")
+    }
+    getUsers()
+  },[])
+  const renderUsers = userData ?  userData?.map(u=>
+    <Users u = {u}/>
+    ) : 
+    null
 
 
     
   const handleNameInput = e =>{
-
-            const filtered = userData.filter(user=>{
-            const isGamesIncludes = user.games.some((game)=>game.includes(e.target.value))
-            
-            return isGamesIncludes ? user : user.name.includes(e.target.value)
-            })
-            console.log(searchedUser)
-            setSearchedUser(filtered)
+    const {value} = e.target
+    if(value== ""){
+        setUserData(searchedUser)
+    } else {
+      const filtered = userData.filter(user=>{
+        const isGamesIncludes = user.games.some((game)=>game.includes(e.target.value))
+        
+        return isGamesIncludes || user.name.includes(value) ? user : null
+        })
+        // console.log(searchedUser)
+        setUserData(filtered)
+    }
         }
 
 const toggleForm = ()=>{setShowSignUp(prev=> !prev)}
@@ -83,14 +99,20 @@ const toggleForm = ()=>{setShowSignUp(prev=> !prev)}
   )
 }
 
-export async function getServerSideProps() {
-  await connectMongoose()
-  console.log("fetched")
+// export async function getServerSideProps() {
+//     initializeDB
+//     db
+//     const userCol = collection(db, "user")
+//     const userDocs = await getDocs(userCol)
+//     const list = userDocs.docs.map(doc=>doc.data())
+    
   
-  const findUsers = await myModel.find({})
-  return {
-            props : {
-                user : JSON.parse(JSON.stringify(findUsers))
-            }
-        }
-} 
+  
+  
+//   // const findUsers = await myModel.find({})
+//   return {
+//             props : {
+//                 user : list
+//             }
+//         }
+// } 

@@ -1,15 +1,7 @@
 import { VStack, HStack, Grid, Badge,  Image, Text, Flex} from "@chakra-ui/react";
 
 const Users = ({u}) => {
-
-    // const userGames = ()=>{
-
-    //     return (
-            
-    //     )
-    // }
-
-    const renderGames =u.games.map(game=>
+    const renderGames =u.games?.map(game=>
             <Badge variant='solid' colorScheme='green'>
             {game}
             </Badge>

@@ -23,6 +23,11 @@ import axios from 'axios'
 import { useCallback, useRef, useState } from 'react'
 import { AddIcon } from '@chakra-ui/icons'
 import { useRouter } from 'next/router'
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { db, initializeDB, storage } from '../lib/firebase'
+import { doc, addDoc, collection } from "firebase/firestore/lite";
+import {getStorage, ref, uploadBytes} from "firebase/storage"
+
 
 const reqMessage = "This field is required"
 
@@ -60,6 +65,7 @@ const SignUpForm=({toggleForm})=> {
 
     const handleFile = (e)=>{
         setFile(e.target.files[0])
+        
     }
 
 
@@ -85,31 +91,36 @@ const SignUpForm=({toggleForm})=> {
 
    
     
+    const auth = getAuth(initializeDB);
+    
     const onSubmit = async data =>{
-        console.log(data.file[0])
-        console.log(data)
         data.games = gameArr
-         axios.post("/api/postuser", data)
-        .then(function (response) {
-            console.log(response);
-            router.push("/api/auth/signin")
-            
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
-
+        const {name, email, password, profile, games, file} = data
+        const metadata = {
+            customMetadata : {
+                "userEmail" : `${email}`
+            }
+        }
+        console.log(data)
         
+        const storageRef = ref(storage, file[0].name)
+        try {
+            const f = await uploadBytes(storageRef, file[0], metadata)
+            console.log("upload")
+            const userCre = createUserWithEmailAndPassword(auth, data.email, data.password)
+            const saveUser = addDoc(collection(db, "user"), {
+                    name : name,
+                    email : email,
+                    games : games,
+                    profile : profile,
+                    password : password,
+                }
+            )
 
-        // const formData = new FormData()
-        // formData.append("name", data.name)
-        // formData.append("email", data.email)
-        // formData.append("password", data.password)
-        // formData.append("profile", data.profile)
-        // formData.append("games", gameArr)
-        // formData.append('file', data.file[0])
-
-        // await axios.post("/api/postuser", formData, axiosConfig)
+            Promise.all([userCre, saveUser])
+        } catch (error) {
+            console.log(error)
+        }
         
     }
 
