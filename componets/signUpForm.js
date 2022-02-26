@@ -23,7 +23,7 @@ import axios from 'axios'
 import { useCallback, useRef, useState } from 'react'
 import { AddIcon } from '@chakra-ui/icons'
 import { useRouter } from 'next/router'
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { db, initializeDB, storage } from '../lib/firebase'
 import { doc, addDoc, collection } from "firebase/firestore/lite";
 import {getStorage, ref, uploadBytes} from "firebase/storage"
@@ -103,7 +103,7 @@ const SignUpForm=({toggleForm})=> {
         }
         console.log(data)
         
-        const storageRef = ref(storage, file[0].name)
+        const storageRef = ref(storage, file[0]?.name)
         try {
             const f = await uploadBytes(storageRef, file[0], metadata)
             console.log("upload")
@@ -118,6 +118,11 @@ const SignUpForm=({toggleForm})=> {
             )
 
             Promise.all([userCre, saveUser])
+            onAuthStateChanged(auth, user=>{
+                if(user){
+                    router.push("/")
+                }
+            })
         } catch (error) {
             console.log(error)
         }

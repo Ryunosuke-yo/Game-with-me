@@ -1,20 +1,22 @@
 import Header from "../componets/Header";
 import { Center, HStack, Image, Text, VStack, Flex, Grid, Heading , Tag, TagLabel, TagCloseButton, Button, FormLabel, Input, FormControl, Icon, InputGroup, InputRightElement, Box} from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
-import {  useSession, getSession } from "next-auth/react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useRef } from "react";
 import { EditIcon,  AddIcon} from "@chakra-ui/icons";
 import Link from "next/link";
+import { getAuth } from "firebase/auth";
+import { db, initializeDB } from "../lib/firebase";
+import { collection, query, where, getDocs, getFirestore  } from "firebase/firestore";
 
 
 
 
 
 
-const Profile = ({test}) => {
-    const [sessionUser, setSessionUser] = useState()
+
+const Profile = () => {
     const [userFromDatabase, setUserFromDatabase] = useState([])
     const {data : session, status} = useSession()
     const fileRef = useRef(null)
@@ -24,25 +26,46 @@ const Profile = ({test}) => {
     const [imgBuffer, setImgBuffer] = useState()
     const [inputField, setInputFiled] = useState(false)
     const [userPIc, setUserPic] = useState()
-    const axiosConfig = {
-        headers : { 'content-type': 'multipart/form-data'  }
-    }
+    // const axiosConfig = {
+    //     headers : { 'content-type': 'multipart/form-data'  }
+    // }
+
+    useEffect(()=>{
+        initializeDB
+        const auth = getAuth()
+        const {currentUser} = auth
+        const col = collection(getFirestore(), "user")
+        if(currentUser !== null){
+            console.log(currentUser)
+            const q = query(col, where("email", "==", currentUser.email));
+            console.log(q)
+
+            const d = async ()=>{
+                const user = await getDocs(q)
+                user.forEach(u=>console.log(u.data()))
+            }
+            d()
+            
+        } else {
+            console.log("no user")
+        }
+    },[])
 
     const {register, handleSubmit, formState : {errors}} = useForm()
 
     const onSubmit = async data => {
-        data.emailToUpdate = session.user.email
-        const formData = new FormData()
-        formData.append('file', fileName)
-        formData.append('email', session.user.email)
-        console.log(data)
-        try {
-            const updateUser = axios.post('/api/update', data)
-            const postImg = axios.post('/api/postimg', formData, axiosConfig)
-            const res = await Promise.all([updateUser,postImg])
-        } catch (error) {
-            console.log(error.response.data)
-        }
+        // data.emailToUpdate = session.user.email
+        // const formData = new FormData()
+        // formData.append('file', fileName)
+        // formData.append('email', session.user.email)
+        // console.log(data)
+        // try {
+        //     const updateUser = axios.post('/api/update', data)
+        //     const postImg = axios.post('/api/postimg', formData, axiosConfig)
+        //     const res = await Promise.all([updateUser,postImg])
+        // } catch (error) {
+        //     console.log(error.response.data)
+        // }
     }
 
     const arrayBufferToBase64=(buffer)=> {
@@ -71,25 +94,18 @@ const Profile = ({test}) => {
 
     // console.log(session)
 
-    useEffect(async ()=>{
-        const getUser = axios.get("/api/getauser", {params : session?.user.email})
-        const getPic = axios.get("/api/getpic", {params : session?.user.email})
-        const res = await Promise.all([getUser, getPic])
-        setUserFromDatabase(res[0].data[0])
-        console.log(res)
+    // useEffect(async ()=>{
+    //     const getUser = axios.get("/api/getauser", {params : session?.user.email})
+    //     const getPic = axios.get("/api/getpic", {params : session?.user.email})
+    //     const res = await Promise.all([getUser, getPic])
+    //     setUserFromDatabase(res[0].data[0])
+    //     console.log(res)
 
 
-        setImgBuffer('data:image/png;base64,' + arrayBufferToBase64(res[1].data[0]?.img.data.data))
-        // console.log(imgBuffer)
-    },[])
-    
-    if(isAuthenticated) {
-        // console.log(session.user)
-    } else {
-        // console.log("not authed")
-    }
-   
-    
+    //     setImgBuffer('data:image/png;base64,' + arrayBufferToBase64(res[1].data[0]?.img.data.data))
+    //     // console.log(imgBuffer)
+    // },[])
+      
     const listOfGames = userFromDatabase.games?.map((game, i)=>
        { 
         const colorSchemes = ["red", "cyan", "blue", "green", "teal", "purple", "pink"]
@@ -168,7 +184,7 @@ const Profile = ({test}) => {
     const displayInfo = 
     <>
     <VStack mt="2rem" spacing="3rem" mb="4rem">
-    <Heading borderBottom="1px" fontSize="2rem" fontStyle="italic" fontWeight="lighter">{session.user.name}</Heading>
+    {/* <Heading borderBottom="1px" fontSize="2rem" fontStyle="italic" fontWeight="lighter">{session?.user.name}</Heading> */}
             <Heading as="h1" fontWeight="lighter"  fontSize="2rem" mb="1rem" borderBottom="1px" fontStyle="italic" mt="4rem">Games</Heading>
             <Grid templateColumns="repeat(2, 1fr)" gap={5} >
             {listOfGames}

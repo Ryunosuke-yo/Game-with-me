@@ -1,5 +1,4 @@
 
-import { getSession } from "next-auth/react";
 import { connectMongoose, myModel } from "../../lib/mongodb";
 
 

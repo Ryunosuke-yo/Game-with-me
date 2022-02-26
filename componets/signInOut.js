@@ -1,5 +1,4 @@
 import { Box, Text , Center, VStack} from "@chakra-ui/react"
-import {signIn, signOut} from "next-auth/react"
 import {loggedInContext} from "../pages/index"
 
 

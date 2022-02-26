@@ -2,26 +2,28 @@
 import Head from 'next/head'
 import Header from '../componets/Header'
 import Inputforsearch from '../componets/InputForSearch'
-import {signIn, useSession, signOut} from "next-auth/react"
 import SignUpForm from '../componets/signUpForm'
 import { SignOut, SignIn } from '../componets/signInOut'
-import { Center, list, Text, VStack } from '@chakra-ui/react'
+import { Button, Center, list, Text, VStack } from '@chakra-ui/react'
 import SignedInSuc from '../componets/signedInSuc'
 import { createContext, useCallback, useEffect } from 'react'
 import Users from '../componets/userSearch/users'
 import { useState } from 'react'
 import SignUpButton from '../componets/signUpButton'
 import {db, initializeDB} from "../lib/firebase"
-import { collection, getDocs } from 'firebase/firestore/lite'
-import { getFirestore } from 'firebase/firestore/lite'
+import { query, where, collection, getDocs, getFirestore } from 'firebase/firestore'
+import { getAuth } from "firebase/auth";
+import { getCookie, setCookie } from '../lib/useCookie'
 
 
 
-export default function Home({user}) {
-  const {data : session , status} = useSession()
+
+export default function Home() {
   const [searchedUser, setSearchedUser] = useState(null)
-  const [userData, setUserData] =useState(user)
+  const [userData, setUserData] =useState()
   const [showSignUp, setShowSignUp] = useState(false)
+  const [user, setUser] = useState()
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   
   
   
@@ -32,10 +34,8 @@ export default function Home({user}) {
     //   setUserData(loginFilterUsers)
     //   console.log(session)
     // }, [session])
-    
-    
-    
     useEffect(()=>{
+      
       initializeDB
       const t = getFirestore(initializeDB)
       const getUsers = async ()=>{
@@ -45,6 +45,29 @@ export default function Home({user}) {
       setSearchedUser(list)
       setUserData(list)
       console.log("ano useeffect")
+      console.log(user)
+
+      const auth = getAuth()
+      const {currentUser} = auth
+      const col = collection(getFirestore(), "user")
+      console.log(currentUser)
+
+      if(currentUser !== null){
+        console.log(currentUser)
+        const q = query(userCol, where("email", "==", currentUser.email));
+        console.log(q)
+
+        const d = async ()=>{
+            const user = await getDocs(q)
+            user.forEach(u=>console.log(u.data()))
+        }
+        d()
+        setUser(user)
+        setCookie({name : "test"})
+        
+    } else {
+        console.log("no user")
+    }
     }
     getUsers()
   },[])
@@ -70,6 +93,10 @@ export default function Home({user}) {
     }
         }
 
+  // const handleUser = (u)=>{
+  //   setUser(u)
+  // }
+
 const toggleForm = ()=>{setShowSignUp(prev=> !prev)}
   return (
     <>
@@ -80,10 +107,10 @@ const toggleForm = ()=>{setShowSignUp(prev=> !prev)}
       </Head>
 
       <main>
-        <Header loggedIn={session}/>
-        {session ? <SignedInSuc name={session.user.name} /> : 
+        <Header/>
+        {isLoggedIn ? <SignedInSuc  /> : 
         <>
-        {showSignUp ? <SignUpForm toggleForm={toggleForm}/> :<SignUpButton toggleForm={toggleForm}/>}
+        {showSignUp ? <SignUpForm toggleForm={toggleForm}/> :<SignUpButton toggleForm={toggleForm} setUser={(u)=>setUser(u)}/>}
         
         <SignIn />
         </>
@@ -94,6 +121,7 @@ const toggleForm = ()=>{setShowSignUp(prev=> !prev)}
               {renderUsers}
           </VStack>
         </Center>
+        <Button onClick={()=>getCookie()}>cccc</Button>
       </main>
       </>
   )
