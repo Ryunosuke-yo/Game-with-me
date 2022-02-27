@@ -35,6 +35,12 @@ export default function Home() {
     //   console.log(session)
     // }, [session])
     useEffect(()=>{
+      if(getCookie() == null){
+        setIsLoggedIn(false)
+        console.log("false")
+      } else {
+        setIsLoggedIn(true)
+      }
       
       initializeDB
       const t = getFirestore(initializeDB)
@@ -55,6 +61,9 @@ export default function Home() {
       if(currentUser !== null){
         console.log(currentUser)
         const q = query(userCol, where("email", "==", currentUser.email));
+        const cookieContent = {
+          email : currentUser.email
+        }
         console.log(q)
 
         const d = async ()=>{
@@ -62,8 +71,7 @@ export default function Home() {
             user.forEach(u=>console.log(u.data()))
         }
         d()
-        setUser(user)
-        setCookie({name : "test"})
+        setCookie(currentUser.email)
         
     } else {
         console.log("no user")
@@ -107,7 +115,7 @@ const toggleForm = ()=>{setShowSignUp(prev=> !prev)}
       </Head>
 
       <main>
-        <Header/>
+        <Header isLoggedIn={isLoggedIn}/>
         {isLoggedIn ? <SignedInSuc  /> : 
         <>
         {showSignUp ? <SignUpForm toggleForm={toggleForm}/> :<SignUpButton toggleForm={toggleForm} setUser={(u)=>setUser(u)}/>}

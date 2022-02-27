@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
         
         
         
-export default function Header({loggedIn}){
+export default function Header({isLoggedIn}){
     return (
       <>
         <header>
@@ -42,7 +42,7 @@ export default function Header({loggedIn}){
                   <MenuItem icon={<RepeatIcon />} command='⌘⇧N'>
                     Open Closed Tab
                   </MenuItem>
-                        {loggedIn ? 
+                        {isLoggedIn ? 
                         <Link href="/profile">
                             <a>
                             <MenuItem icon={<EditIcon />}>

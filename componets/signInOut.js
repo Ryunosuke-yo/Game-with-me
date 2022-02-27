@@ -1,5 +1,6 @@
 import { Box, Text , Center, VStack} from "@chakra-ui/react"
 import {loggedInContext} from "../pages/index"
+import { removeCookie } from "../lib/useCookie"
 
 
 
@@ -14,7 +15,7 @@ export function SignIn() {
         
         <a href={'/api/auth/signin'} onClick={(e)=>{
             e.preventDefault()
-            signIn()
+            
           }}>
             Sign In
         </a>
@@ -28,7 +29,7 @@ export function SignIn() {
 export function SignOut() {
             return (
                 <a onClick={()=>{
-                  signOut()
+                  removeCookie()
                 }}>out</a>
                 
     )

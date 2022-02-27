@@ -27,6 +27,7 @@ import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "fir
 import { db, initializeDB, storage } from '../lib/firebase'
 import { doc, addDoc, collection } from "firebase/firestore/lite";
 import {getStorage, ref, uploadBytes} from "firebase/storage"
+import { removeCookie, setCookie } from '../lib/useCookie'
 
 
 const reqMessage = "This field is required"
@@ -90,8 +91,8 @@ const SignUpForm=({toggleForm})=> {
     }
 
    
-    
-    const auth = getAuth(initializeDB);
+    const auth = getAuth(initializeDB)
+    const {currentUser} = auth;
     
     const onSubmit = async data =>{
         data.games = gameArr
@@ -120,9 +121,13 @@ const SignUpForm=({toggleForm})=> {
             Promise.all([userCre, saveUser])
             onAuthStateChanged(auth, user=>{
                 if(user){
-                    router.push("/")
+                        removeCookie()
+                        setCookie(data.email)
+                        router.reload()
                 }
             })
+            // removeCookie()
+            // setCookie(data.email)
         } catch (error) {
             console.log(error)
         }
