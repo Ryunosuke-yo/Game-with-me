@@ -25,9 +25,8 @@ const schema = yup.object().shape({
 const Profile = () => {
     const [userFromDatabase, setUserFromDatabase] = useState()
     const fileRef = useRef(null)
-    const [fileData, setFileData] = useState() 
+    const [gameArr, setGameArr] = useState()
     const [fileName, setFileName] = useState()
-    // const isAuthenticated = status === "authenticated"
     const [imgBuffer, setImgBuffer] = useState()
     const [inputField, setInputFiled] = useState(false)
     const [userPIc, setUserPic] = useState()
@@ -43,18 +42,12 @@ const Profile = () => {
                  // console.log(userDocs)
                 const user = await getDocs(q)
                 user.forEach(u=>setUserFromDatabase(u.data()))
+                setGameArr(userFromDatabase.games)
                 console.log(user)
                 
-                console.log(userFromDatabase)
-                // setUserFromDatabase(d())
-                
-                
+                console.log(userFromDatabase)             
             }
-
-            
             getUser()
-            
-            
         }
     },[])
     useEffect(()=>{
@@ -78,7 +71,25 @@ const Profile = () => {
     })
 
     const onSubmit = async data => {
+        data.games = gameArr
+        const {name, email, password, profile, games, file} = data
+        const validateData = (key)=>{
+            if(key !== undefined){
+                return key
+            } else {
+                return null
+            }
+        }
+        
+        const userObj = {
+            [validateData(name)] : name,
+            [validateData(email)] : email,
+            [validateData(password)] : password,
+            [validateData(profile)] : profile,
+        }
+        
     }
+
     const handleFileName =(e)=>{
             setFileName(e.target.files[0])
             // console.log(e.target.files)
@@ -121,34 +132,31 @@ const Profile = () => {
 
     <form onSubmit={handleSubmit(onSubmit)}>
         <FormControl>
-        <FormLabel htmlFor="name" textAlign='center' fontStyle='italic'>Name</FormLabel>
-        <Input placeholder={userFromDatabase?.name} id='name' variant='flushed' fontStyle='italic' fontWeight="lighter" {...register("name")}/>
+            <FormLabel htmlFor="name" textAlign='center' fontStyle='italic'>Name</FormLabel>
+            <Input placeholder={userFromDatabase?.name} id='name' variant='flushed' fontStyle='italic' fontWeight="lighter" {...register("name")}/>
         </FormControl>
 
         <FormControl>
-        <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >email</FormLabel>
-        <Input variant='flushed' placeholder={userFromDatabase?.email} id='email' variant='flushed' fontStyle='italic' fontWeight="lighter" {...register("email")}/>
+            <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >email</FormLabel>
+            <Input variant='flushed' placeholder={userFromDatabase?.email} id='email' variant='flushed' fontStyle='italic' fontWeight="lighter" {...register("email")}/>
         </FormControl>
 
         <FormControl>
-        <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >games</FormLabel>
-        <InputGroup>
-        <Input variant='flushed' placeholder='edit your games' id='games' variant='flushed' fontStyle='italic' fontWeight="lighter"/>
-        <InputRightElement children={<AddIcon />}/>
-        </InputGroup>
-        <Grid mt="1rem" templateColumns='repeat(3, 1fr)' gap="1em" >
-        {renderGameTags}
-        </Grid>
+            <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >games</FormLabel>
+            <InputGroup>
+            <Input variant='flushed' placeholder='edit your games' id='games' variant='flushed' fontStyle='italic' fontWeight="lighter"/>
+            <InputRightElement children={<AddIcon />}/>
+            </InputGroup>
+            <Grid mt="1rem" templateColumns='repeat(3, 1fr)' gap="1em" >
+            {renderGameTags}
+            </Grid>
         </FormControl>
 
         <FormControl>
-        <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >profile</FormLabel>
-        <Input variant='flushed' placeholder={userFromDatabase?.profile} id='profile' variant='flushed' fontStyle='italic' fontWeight="lighter" {...register("profile")}/>
+            <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >profile</FormLabel>
+            <Input variant='flushed' placeholder={userFromDatabase?.profile} id='profile' variant='flushed' fontStyle='italic' fontWeight="lighter" {...register("profile")}/>
         </FormControl>
         <Button type="submit">Update</Button>
-        <Link href="/api/auth/[...nextauth]">
-            <a>sss</a>
-        </Link>
     </form>
 
     </VStack>
@@ -187,10 +195,9 @@ const Profile = () => {
                 borderRadius='full'
                 boxSize='150px'
                 src={imgUrl}
-                alt='Dan Abramov'
+                alt='No profile pic'
                 boxSize="200px"
                 mb="1rem"
-                onClick={b}
                 />
                 <form onSubmit={handleSubmit(onSubmit)}>
                 <FormControl  >
@@ -200,8 +207,6 @@ const Profile = () => {
                 {...register('file')}/>
                 </FormLabel>
                 </FormControl>
-                {/* <Input id='name' {...register('name')}/>
-                <Button type="submit">Tetst</Button> */}
                 </form>
                 </VStack>
                 
@@ -213,20 +218,6 @@ const Profile = () => {
         </>
     );
 }
-
-// export async function getServerSideProps(req, res){
-//     connectMongoose()
-//     const docs = await Test.find({name : "test"})
-    
-    
-    
-//     return {
-//         props : {
-//             test : JSON.parse(JSON.stringify(docs[0]))
-//         }
-//     }
-// }
-
 
 
 export default Profile;

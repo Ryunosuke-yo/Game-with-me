@@ -50,6 +50,7 @@ const SignUpForm=({toggleForm})=> {
     const [gameArr, setGameArr] = useState([])
     const gameInpRef = useRef(null)
     const [file, setFile] = useState()
+    const [gameError, setGameError] = useState(false)
     const axiosConfig = {
         headers : { 'content-type': 'multipart/form-data'  }
     }
@@ -95,44 +96,53 @@ const SignUpForm=({toggleForm})=> {
     const {currentUser} = auth;
     
     const onSubmit = async data =>{
-        data.games = gameArr
-        const {name, email, password, profile, games, file} = data
-        const metadata = {
-            customMetadata : {
-                "userEmail" : `${email}`
+        if(gameArr.length == 0){
+            setGameError(true)
+        } else {
+            
+            data.games = gameArr
+            const {name, email, password, profile, games, file} = data
+            const metadata = {
+                customMetadata : {
+                    "userEmail" : `${email}`
+                }
             }
-        }
-        console.log(data)
-        
-        const storageRef = ref(storage, `user_${data.email}`, )
-        try {
-            const f = await uploadBytes(storageRef, file[0], metadata)
-            console.log("upload")
-            const userCre = createUserWithEmailAndPassword(auth, data.email, data.password)
-            const saveUser = addDoc(collection(db, "user"), {
-                    name : name,
-                    email : email,
-                    games : games,
-                    profile : profile,
-                    password : password,
-                }
-            )
-
-            Promise.all([userCre, saveUser])
-            onAuthStateChanged(auth, user=>{
-                if(user){
-                        // removeCookie()
-                        setCookie(data.email)
-                        // s
-                }
-            })
-            // removeCookie()
-            // setCookie(data.email)
-        } catch (error) {
-            console.log(error)
+            console.log(data)
+            
+            const storageRef = ref(storage, `user_${data.email}`, )
+            try {
+                const f = await uploadBytes(storageRef, file[0], metadata)
+                console.log("upload")
+                const userCre = createUserWithEmailAndPassword(auth, data.email, data.password)
+                const saveUser = addDoc(collection(db, "user"), {
+                        name : name,
+                        email : email,
+                        games : games,
+                        profile : profile,
+                        password : password,
+                    }
+                )
+    
+                Promise.all([userCre, saveUser])
+                onAuthStateChanged(auth, user=>{
+                    if(user){
+                            setCookie(data.email)
+                    }
+                })
+                // removeCookie()
+                // setCookie(data.email)
+            } catch (error) {
+                console.log(error)
+            }
         }
         
     }
+
+    const handleGameEr = ()=>{
+        gameArr.length = 0 ? setGameError(true) : null
+    }
+
+    const gameErComp = <Center color="red" mt="0.4rem">Please enter at least 1 game</Center>
 
     const erComp = (er)=><Text textAlign="center" color="red" m="0.5rem 0 1rem 0">{er}</Text>
     return (
@@ -180,8 +190,9 @@ const SignUpForm=({toggleForm})=> {
                         </FormLabel>
                         <InputGroup>
                         <InputRightElement children={<AddIcon onClick={handleGameClick} />}/>
-                        <Input id="games" type="games" ref={gameInpRef} />
+                        <Input id="games" type="games" ref={gameInpRef} placeholder={gameArr.length == 0 ? "at least one game" : null}/>
                         </InputGroup>
+                        {gameError ? gameErComp : null}
                         <Grid mt="1rem" templateColumns='repeat(3, 1fr)' gap="1em" >
                         {renderGameTags}
                         </Grid>
