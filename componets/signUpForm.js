@@ -104,7 +104,7 @@ const SignUpForm=({toggleForm})=> {
         }
         console.log(data)
         
-        const storageRef = ref(storage, file[0]?.name)
+        const storageRef = ref(storage, `user_${data.email}`, )
         try {
             const f = await uploadBytes(storageRef, file[0], metadata)
             console.log("upload")
@@ -121,9 +121,9 @@ const SignUpForm=({toggleForm})=> {
             Promise.all([userCre, saveUser])
             onAuthStateChanged(auth, user=>{
                 if(user){
-                        removeCookie()
+                        // removeCookie()
                         setCookie(data.email)
-                        router.reload()
+                        // s
                 }
             })
             // removeCookie()

@@ -1,7 +1,6 @@
 import Header from "../componets/Header";
 import { Center, HStack, Image, Text, VStack, Flex, Grid, Heading , Tag, TagLabel, TagCloseButton, Button, FormLabel, Input, FormControl, Icon, InputGroup, InputRightElement, Box} from "@chakra-ui/react";
 import { useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useRef } from "react";
 import { EditIcon,  AddIcon} from "@chakra-ui/icons";
@@ -10,11 +9,17 @@ import { getAuth } from "firebase/auth";
 import { db, initializeDB } from "../lib/firebase";
 import { collection, query, where, getDocs, getFirestore, getDoc  } from "firebase/firestore";
 import { getCookie } from "../lib/useCookie";
+import { getStorage, ref, deleteObject, getDownloadURL, list } from "firebase/storage"
+import * as yup from "yup"
+import {yupResolver} from "@hookform/resolvers/yup"
 
 
-
-
-
+const schema = yup.object().shape({
+    name : yup.string().max(20, "20 characters maximum"),
+    email : yup.string().email("Not valid email address"),
+    password : yup.string().min(6, "Password should be more than 6 characters").max(20, "Password should be less than 20 characters"),
+    profile : yup.string()
+})
 
 
 const Profile = () => {
@@ -26,75 +31,60 @@ const Profile = () => {
     const [imgBuffer, setImgBuffer] = useState()
     const [inputField, setInputFiled] = useState(false)
     const [userPIc, setUserPic] = useState()
-    // const axiosConfig = {
-    //     headers : { 'content-type': 'multipart/form-data'  }
-    // }
-
+    const [imgUrl, setImgUrl] = useState()
     useEffect(()=>{
         initializeDB
-        // const auth = getAuth()
-        // const {currentUser} = auth
-        // const col = collection(getFirestore(), "user")
-        // if(currentUser !== null){
-        //     console.log(currentUser)
-        //     const q = query(col, where("email", "==", currentUser.email));
-        //     console.log(q)
 
-        //     const d = async ()=>{
-        //         const user = await getDocs(q)
-        //         user.forEach(u=>console.log(u.data()))
-        //         const list = user.map(u=>u.data())
-        //         setUserFromDatabase(list)
-        //     }
-        //     d()
-        // } else {
-        //     console.log("no user")
-        // }
          if(getCookie){
-            const getUser = async ()=>{
+             const getUser = async ()=>{
+                 
+                 const userCol = collection(getFirestore(), "user")
+                 const q = query(userCol, where("email", "==", getCookie()));
+                 // console.log(userDocs)
+                const user = await getDocs(q)
+                user.forEach(u=>setUserFromDatabase(u.data()))
+                console.log(user)
                 
-                const userCol = collection(getFirestore(), "user")
-                const q = query(userCol, where("email", "==", getCookie()));
-                // console.log(userDocs)
-                const d = async ()=>{
-                    const user = await getDocs(q)
-                    user.forEach(u=>setUserFromDatabase(u.data()))
-                    console.log(user)
-                }
                 console.log(userFromDatabase)
                 // setUserFromDatabase(d())
-                d()
+                
                 
             }
 
+            
             getUser()
             
-
+            
         }
     },[])
+    useEffect(()=>{
+        const getImg = async ()=>{
+            const storage = getStorage()
+            if (userFromDatabase !== undefined){
+                const i = userFromDatabase.email
+                const storageRef =  ref(storage, `user_${i}`, )
+                const url = await getDownloadURL(storageRef)
+                setImgUrl(url)
+                console.log(url)
+                
+            }
+    
+        }
+        getImg()
 
-    const {register, handleSubmit, formState : {errors}} = useForm()
+    })
+    const {register, handleSubmit, formState : {errors}} = useForm({
+        resolver : yupResolver(schema)
+    })
 
     const onSubmit = async data => {
     }
-
-    const arrayBufferToBase64=(buffer)=> {
-        const binary = '';
-        const bytes = [].slice.call(new Uint8Array(buffer));
-        bytes.forEach((b) => binary += String.fromCharCode(b));
-        return window.btoa(binary);
-    };
-    const b = ()=>{
-    
-    }
     const handleFileName =(e)=>{
-      
             setFileName(e.target.files[0])
             // console.log(e.target.files)
-           
     }
       
-    const listOfGames = userFromDatabase.games?.map((game, i)=>
+    const listOfGames = userFromDatabase?.games.map((game, i)=>
        { 
         const colorSchemes = ["red", "cyan", "blue", "green", "teal", "purple", "pink"]
         const randomIndex = Math.floor(Math.random() * colorSchemes.length) + 1;
@@ -108,7 +98,7 @@ const Profile = () => {
     }
     )
 
-    const renderGameTags = userFromDatabase.games?.map((game, i)=>
+    const renderGameTags = userFromDatabase?.games.map((game, i)=>
 {
     const colorSchemes = ["red", "cyan", "blue", "green", "teal", "purple", "pink"]
     const randomIndex = Math.floor(Math.random() * colorSchemes.length) + 1;
@@ -196,7 +186,7 @@ const Profile = () => {
             <Image
                 borderRadius='full'
                 boxSize='150px'
-                src={imgBuffer}
+                src={imgUrl}
                 alt='Dan Abramov'
                 boxSize="200px"
                 mb="1rem"

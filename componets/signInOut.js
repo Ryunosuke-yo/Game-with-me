@@ -1,20 +1,21 @@
 import { Box, Text , Center, VStack} from "@chakra-ui/react"
 import {loggedInContext} from "../pages/index"
 import { removeCookie } from "../lib/useCookie"
+import { useRouter } from "next/router"
 
 
 
 
 export function SignIn() {
-
-
-    return (
+  
+  
+  return (
         <Center mt="1rem">
         <VStack>
         <Text>Or</Text>
         
         <a href={'/api/auth/signin'} onClick={(e)=>{
-            e.preventDefault()
+          e.preventDefault()
             
           }}>
             Sign In
@@ -26,10 +27,12 @@ export function SignIn() {
         }
         
         
-export function SignOut() {
+        export function SignOut() {
+            const router = useRouter()
             return (
                 <a onClick={()=>{
                   removeCookie()
+                  router.reload()
                 }}>out</a>
                 
     )
