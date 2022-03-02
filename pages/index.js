@@ -134,21 +134,3 @@ const toggleForm = ()=>{setShowSignUp(prev=> !prev)}
       </>
   )
 }
-
-// export async function getServerSideProps() {
-//     initializeDB
-//     db
-//     const userCol = collection(db, "user")
-//     const userDocs = await getDocs(userCol)
-//     const list = userDocs.docs.map(doc=>doc.data())
-    
-  
-  
-  
-//   // const findUsers = await myModel.find({})
-//   return {
-//             props : {
-//                 user : list
-//             }
-//         }
-// } 

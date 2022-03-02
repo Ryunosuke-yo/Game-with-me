@@ -1,13 +1,13 @@
 import Header from "../componets/Header";
-import { Center, HStack, Image, Text, VStack, Flex, Grid, Heading , Tag, TagLabel, TagCloseButton, Button, FormLabel, Input, FormControl, Icon, InputGroup, InputRightElement, Box} from "@chakra-ui/react";
-import { useContext, useEffect, useState } from "react";
+import { Center, HStack, Image, Text, VStack, Flex, Grid, Heading , Tag, TagLabel, TagCloseButton, Button, FormLabel, Input, FormControl, Icon, InputGroup, InputRightElement, TagRightIcon} from "@chakra-ui/react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRef } from "react";
 import { EditIcon,  AddIcon} from "@chakra-ui/icons";
 import Link from "next/link";
 import { getAuth } from "firebase/auth";
 import { db, initializeDB } from "../lib/firebase";
-import { collection, query, where, getDocs, getFirestore, getDoc  } from "firebase/firestore";
+import { collection, query, where, getDocs, getFirestore, updateDoc, doc } from "firebase/firestore";
 import { getCookie } from "../lib/useCookie";
 import { getStorage, ref, deleteObject, getDownloadURL, list } from "firebase/storage"
 import * as yup from "yup"
@@ -25,12 +25,13 @@ const schema = yup.object().shape({
 const Profile = () => {
     const [userFromDatabase, setUserFromDatabase] = useState()
     const fileRef = useRef(null)
-    const [gameArr, setGameArr] = useState()
+    const [gameArr, setGameArr] = useState([])
     const [fileName, setFileName] = useState()
     const [imgBuffer, setImgBuffer] = useState()
     const [inputField, setInputFiled] = useState(false)
     const [userPIc, setUserPic] = useState()
     const [imgUrl, setImgUrl] = useState()
+    const gameRef = useRef(null)
     useEffect(()=>{
         initializeDB
 
@@ -41,10 +42,9 @@ const Profile = () => {
                  const q = query(userCol, where("email", "==", getCookie()));
                  // console.log(userDocs)
                 const user = await getDocs(q)
-                user.forEach(u=>setUserFromDatabase(u.data()))
-                setGameArr(userFromDatabase.games)
+                user.forEach(u=>{setUserFromDatabase(u.data()), setGameArr(u.data().games)})
                 console.log(user)
-                
+                console.log(user.id)
                 console.log(userFromDatabase)             
             }
             getUser()
@@ -61,7 +61,7 @@ const Profile = () => {
                 console.log(url)
                 
             }
-    
+            
         }
         getImg()
 
@@ -72,9 +72,10 @@ const Profile = () => {
 
     const onSubmit = async data => {
         data.games = gameArr
+        // console.log(user)
         const {name, email, password, profile, games, file} = data
-        const validateData = (key)=>{
-            if(key !== undefined){
+        const validateData = (key, value)=>{
+            if(value !== undefined){
                 return key
             } else {
                 return null
@@ -82,20 +83,39 @@ const Profile = () => {
         }
         
         const userObj = {
-            [validateData(name)] : name,
-            [validateData(email)] : email,
-            [validateData(password)] : password,
-            [validateData(profile)] : profile,
+            [validateData("name",name)] : name,
+            [validateData("email", email)] : email,
+            [validateData("password", password)] : password,
+            [validateData("profile", profile)] : profile,
+            [validateData("games", gameArr)] : gameArr
         }
+
+        // const userCol = collection(getFirestore(), "user")
+        // const q = query(userCol, where("email", "==", getCookie()));
+        const docRef = doc(getFirestore(), "user", data.email)
+        // const ge = await getDocs(q)
+        await updateDoc(docRef, userObj)
+        console.log("updated")
         
     }
 
+    const addGames = ()=>{
+        const {value} = gameRef.current
+        console.log(userFromDatabase)
+        
+        
+        setGameArr([
+            ...gameArr,
+            value
+        ]) 
+        console.log(gameArr)
+    }
     const handleFileName =(e)=>{
             setFileName(e.target.files[0])
             // console.log(e.target.files)
     }
       
-    const listOfGames = userFromDatabase?.games.map((game, i)=>
+    const listOfGames = gameArr.map((game, i)=>
        { 
         const colorSchemes = ["red", "cyan", "blue", "green", "teal", "purple", "pink"]
         const randomIndex = Math.floor(Math.random() * colorSchemes.length) + 1;
@@ -108,19 +128,25 @@ const Profile = () => {
             </Tag>)
     }
     )
+    
+    const removeGameFromArr = (game2)=>{
+        const filtered = gameArr.filter((game)=> game != game2)
+        setGameArr(filtered)
+    }
+    const renderGameTags = gameArr.map((game, i)=>{
 
-    const renderGameTags = userFromDatabase?.games.map((game, i)=>
-{
     const colorSchemes = ["red", "cyan", "blue", "green", "teal", "purple", "pink"]
     const randomIndex = Math.floor(Math.random() * colorSchemes.length) + 1;
 
     return (
-        <Tag size="md" borderRadius='full' variant='outline' colorScheme={colorSchemes[randomIndex]} key={i}>
-            <Flex align="center"  direction="row" w="100% " justifyContent="space-between" >
-                <TagLabel>{game}</TagLabel>
-                <TagCloseButton />
+        <Flex align="center"  direction="row" w="100% " justifyContent="space-between" >
+                <Tag size="md" borderRadius='full' variant='outline' colorScheme={colorSchemes[randomIndex]} key={i}>
+                
+                <TagLabel >{game}</TagLabel>
+                <TagRightIcon onClick={()=>removeGameFromArr(game)} />
+                
+            </Tag>
             </Flex>
-        </Tag>
         )}
 )
 
@@ -142,10 +168,15 @@ const Profile = () => {
         </FormControl>
 
         <FormControl>
-            <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >games</FormLabel>
+            <FormLabel htmlFor="password"  textAlign='center' fontStyle='italic' >password</FormLabel>
+            <Input variant='flushed' placeholder={userFromDatabase?.password} id='password' variant='flushed' fontStyle='italic' fontWeight="lighter" {...register("password")}/>
+        </FormControl>
+
+        <FormControl>
+            <FormLabel htmlFor="games"  textAlign='center' fontStyle='italic'>games</FormLabel>
             <InputGroup>
-            <Input variant='flushed' placeholder='edit your games' id='games' variant='flushed' fontStyle='italic' fontWeight="lighter"/>
-            <InputRightElement children={<AddIcon />}/>
+            <Input variant='flushed' placeholder='edit your games' id='games' variant='flushed' fontStyle='italic' fontWeight="lighter" ref={gameRef}/>
+            <InputRightElement children={<AddIcon onClick={addGames}/>}/>
             </InputGroup>
             <Grid mt="1rem" templateColumns='repeat(3, 1fr)' gap="1em" >
             {renderGameTags}
@@ -153,7 +184,7 @@ const Profile = () => {
         </FormControl>
 
         <FormControl>
-            <FormLabel htmlFor="email"  textAlign='center' fontStyle='italic' >profile</FormLabel>
+            <FormLabel htmlFor="profile"  textAlign='center' fontStyle='italic' >profile</FormLabel>
             <Input variant='flushed' placeholder={userFromDatabase?.profile} id='profile' variant='flushed' fontStyle='italic' fontWeight="lighter" {...register("profile")}/>
         </FormControl>
         <Button type="submit">Update</Button>

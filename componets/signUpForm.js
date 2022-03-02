@@ -25,9 +25,9 @@ import { AddIcon } from '@chakra-ui/icons'
 import { useRouter } from 'next/router'
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { db, initializeDB, storage } from '../lib/firebase'
-import { doc, addDoc, collection } from "firebase/firestore/lite";
 import {getStorage, ref, uploadBytes} from "firebase/storage"
 import { removeCookie, setCookie } from '../lib/useCookie'
+import { getFirestore, setDoc, doc } from 'firebase/firestore'
 
 
 const reqMessage = "This field is required"
@@ -51,10 +51,6 @@ const SignUpForm=({toggleForm})=> {
     const gameInpRef = useRef(null)
     const [file, setFile] = useState()
     const [gameError, setGameError] = useState(false)
-    const axiosConfig = {
-        headers : { 'content-type': 'multipart/form-data'  }
-    }
-
     const handleGameClick = useCallback(()=>{
         const val = gameInpRef.current.value
        setGameArr([
@@ -112,21 +108,31 @@ const SignUpForm=({toggleForm})=> {
             const storageRef = ref(storage, `user_${data.email}`, )
             try {
                 const f = await uploadBytes(storageRef, file[0], metadata)
-                console.log("upload")
+                // const docRef = doc(getFirestore(), "user", data.email)
                 const userCre = createUserWithEmailAndPassword(auth, data.email, data.password)
-                const saveUser = addDoc(collection(db, "user"), {
-                        name : name,
-                        email : email,
-                        games : games,
-                        profile : profile,
-                        password : password,
-                    }
-                )
-    
+                // const saveUser = addDoc(collection(db, "user"), {
+                    //         name : name,
+                    //         email : email,
+                    //         games : games,
+                //         profile : profile,
+                //         password : password,
+                //     }
+                // )
+
+                const saveUser = setDoc(doc(getFirestore(),"user", data.email), {
+                    name : name,
+                    email : email,
+                    games : games,
+                    profile : profile,
+                    password : password,
+                })
+                
                 Promise.all([userCre, saveUser])
+                console.log("upload")
                 onAuthStateChanged(auth, user=>{
                     if(user){
                             setCookie(data.email)
+                            router.reload()
                     }
                 })
                 // removeCookie()
