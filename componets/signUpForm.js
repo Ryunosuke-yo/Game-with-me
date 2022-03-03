@@ -36,7 +36,8 @@ const schema = yup.object().shape({
     name : yup.string().required(reqMessage).max(20, "20 characters maximum"),
     email : yup.string().email("Not valid email address").required(reqMessage),
     password : yup.string().required(reqMessage).min(5, "Password should be more than 5 characters").max(20, "Password should be less than 20 characters"),
-    profile : yup.string()
+    profile : yup.string(),
+    id : yup.string().required(reqMessage).max(20, "20 characters maximum")
 }).required()
 
 
@@ -105,7 +106,7 @@ const SignUpForm=({toggleForm})=> {
             }
             console.log(data)
             
-            const storageRef = ref(storage, `user_${data.email}`, )
+            const storageRef = ref(storage, `user_${data.id}`)
             try {
                 const f = await uploadBytes(storageRef, file[0], metadata)
                 // const docRef = doc(getFirestore(), "user", data.email)
@@ -119,21 +120,25 @@ const SignUpForm=({toggleForm})=> {
                 //     }
                 // )
 
-                const saveUser = setDoc(doc(getFirestore(),"user", data.email), {
+                const saveUser = setDoc(doc(getFirestore(),"user", data.id), {
                     name : name,
                     email : email,
                     games : games,
                     profile : profile,
                     password : password,
+                    id : data.id
                 })
                 
                 Promise.all([userCre, saveUser])
-                console.log("upload")
-                onAuthStateChanged(auth, user=>{
-                    if(user){
-                            setCookie(data.email)
-                            router.reload()
-                    }
+                .then(()=>{
+                    console.log("upload")
+                    onAuthStateChanged(auth, user=>{
+                        if(user){
+                                setCookie(data.id)
+                                router.reload()
+                        }
+                    })
+
                 })
                 // removeCookie()
                 // setCookie(data.email)
@@ -165,6 +170,14 @@ const SignUpForm=({toggleForm})=> {
                         </FormLabel>
                     <Input id="name" type="name" {...register("name")}/>
                     {erComp(errors.name?.message)}
+                    </FormControl>
+
+                    <FormControl>
+                        <FormLabel htmlFor='id' borderBottom="1px" textAlign="center">
+                        UserId
+                        </FormLabel>
+                    <Input id="id" type="name" {...register("id")}/>
+                    {erComp(errors.id?.message)}
                     </FormControl>
 
                     <FormControl>

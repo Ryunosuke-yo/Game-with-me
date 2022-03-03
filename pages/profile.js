@@ -5,13 +5,14 @@ import { useForm } from "react-hook-form";
 import { useRef } from "react";
 import { EditIcon,  AddIcon} from "@chakra-ui/icons";
 import Link from "next/link";
-import { getAuth } from "firebase/auth";
-import { db, initializeDB } from "../lib/firebase";
+import { getAuth, updateProfile } from "firebase/auth";
+import { db, initializeDB, storage } from "../lib/firebase";
 import { collection, query, where, getDocs, getFirestore, updateDoc, doc } from "firebase/firestore";
-import { getCookie } from "../lib/useCookie";
-import { getStorage, ref, deleteObject, getDownloadURL, list } from "firebase/storage"
+import { getCookie, setCookie } from "../lib/useCookie";
+import { getStorage, ref, deleteObject, getDownloadURL, uploadBytes } from "firebase/storage"
 import * as yup from "yup"
 import {yupResolver} from "@hookform/resolvers/yup"
+import { useRouter } from "next/router";
 
 
 const schema = yup.object().shape({
@@ -32,6 +33,7 @@ const Profile = () => {
     const [userPIc, setUserPic] = useState()
     const [imgUrl, setImgUrl] = useState()
     const gameRef = useRef(null)
+    const router = useRouter()
     useEffect(()=>{
         initializeDB
 
@@ -39,7 +41,7 @@ const Profile = () => {
              const getUser = async ()=>{
                  
                  const userCol = collection(getFirestore(), "user")
-                 const q = query(userCol, where("email", "==", getCookie()));
+                 const q = query(userCol, where("id", "==", getCookie()));
                  // console.log(userDocs)
                 const user = await getDocs(q)
                 user.forEach(u=>{setUserFromDatabase(u.data()), setGameArr(u.data().games)})
@@ -48,17 +50,18 @@ const Profile = () => {
                 console.log(userFromDatabase)             
             }
             getUser()
+            
         }
     },[])
     useEffect(()=>{
         const getImg = async ()=>{
             const storage = getStorage()
             if (userFromDatabase !== undefined){
-                const i = userFromDatabase.email
-                const storageRef =  ref(storage, `user_${i}`, )
+                const {id} = userFromDatabase
+                const storageRef =  ref(storage, `user_${id}`, )
                 const url = await getDownloadURL(storageRef)
                 setImgUrl(url)
-                console.log(url)
+                // console.log(url)
                 
             }
             
@@ -92,11 +95,23 @@ const Profile = () => {
 
         // const userCol = collection(getFirestore(), "user")
         // const q = query(userCol, where("email", "==", getCookie()));
-        const docRef = doc(getFirestore(), "user", data.email)
-        // const ge = await getDocs(q)
+        const docRef = doc(getFirestore(), "user", userFromDatabase.id)
+        console.log(docRef.id)
         await updateDoc(docRef, userObj)
+        // setCookie(data.email)
+        // const auth = getAuth()
+        // console.log(auth.currentUser.id)
+        // await updateProfile(auth.currentUser, {
+        //     email : data.email
+        // })
         console.log("updated")
+        console.log(file[0])
         
+        // const desertRef = ref(storage, `user_${userFromDatabase.email}`)
+        // const d = deleteObject(desertRef)
+        const storageRef = ref(storage, `user_${userFromDatabase.id}`)
+        const f = await uploadBytes(storageRef, file[0])
+        router.reload()
     }
 
     const addGames = ()=>{
