@@ -14,9 +14,7 @@ export function SignIn() {
         <VStack>
         <Text>Or</Text>
         
-        <a href={'/api/auth/signin'} onClick={(e)=>{
-          e.preventDefault()
-            
+        <a href={'/signIn'} onClick={(e)=>{
           }}>
             Sign In
         </a>

@@ -26,14 +26,7 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   
   
-  
-  
-  // useEffect(()=>{
-    //   const loginFilterUsers = userData?.filter(u=>u.email != session?.user.email)
-    //   setSearchedUser(loginFilterUsers)
-    //   setUserData(loginFilterUsers)
-    //   console.log(session)
-    // }, [session])
+
     useEffect(()=>{
       if(getCookie() == null){
         setIsLoggedIn(false)
@@ -57,32 +50,12 @@ export default function Home() {
       const {currentUser} = auth
       const col = collection(getFirestore(), "user")
       console.log(currentUser)
-
-      if(currentUser !== null){
-        console.log(currentUser)
-        const q = query(userCol, where("email", "==", currentUser.email));
-        const cookieContent = {
-          email : currentUser.email
-        }
-        console.log(q)
-
-        const d = async ()=>{
-            const user = await getDocs(q)
-            user.forEach(u=>console.log(u.data()))
-        }
-        d()
-        setCookie(currentUser.email)
-        
-    } else {
-        console.log("no user")
-    }
     }
     getUsers()
+    // console.log(getCookie())
   },[])
-  const renderUsers = userData ?  userData?.map(u=>
-    <Users u = {u}/>
-    ) : 
-    null
+  const renderUsers = getCookie != null ? userData?.filter(u=> u.id != getCookie()).map(u=><Users u={u}/>) : userData?.map(u=><Users u={u}/>)
+
 
 
     
@@ -101,10 +74,6 @@ export default function Home() {
     }
         }
 
-  // const handleUser = (u)=>{
-  //   setUser(u)
-  // }
-
 const toggleForm = ()=>{setShowSignUp(prev=> !prev)}
   return (
     <>
@@ -116,7 +85,7 @@ const toggleForm = ()=>{setShowSignUp(prev=> !prev)}
 
       <main>
         <Header isLoggedIn={isLoggedIn}/>
-        {isLoggedIn ? <SignedInSuc  /> : 
+        {isLoggedIn ? <SignedInSuc /> : 
         <>
         {showSignUp ? <SignUpForm toggleForm={toggleForm}/> :<SignUpButton toggleForm={toggleForm} setUser={(u)=>setUser(u)}/>}
         
@@ -129,7 +98,7 @@ const toggleForm = ()=>{setShowSignUp(prev=> !prev)}
               {renderUsers}
           </VStack>
         </Center>
-        <Button onClick={()=>getCookie()}>cccc</Button>
+        <Button onClick={()=>console.log(userData)}>cccc</Button>
       </main>
       </>
   )

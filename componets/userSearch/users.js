@@ -1,12 +1,27 @@
 import { VStack, HStack, Grid, Badge,  Image, Text, Flex} from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { getStorage, ref, deleteObject, getDownloadURL, uploadBytes } from "firebase/storage"
 
 const Users = ({u}) => {
+    const [imgUrl, setImgUrl]= useState()
     const renderGames =u.games?.map(game=>
             <Badge variant='solid' colorScheme='green'>
             {game}
             </Badge>
         )
         console.log("user desu")
+
+        useEffect(()=>{
+            const getImg = async ()=>{
+                const storage = getStorage()
+                    const storageRef =  ref(storage, `user_${u.id}`, )
+                    const url = await getDownloadURL(storageRef)
+                    setImgUrl(url)
+                    
+                }
+                getImg()
+            console.log(imgUrl)
+        })
     return (
             <VStack border="1px" w="80%" p="1rem 0 1rem 0" borderColor="grey"borderRadius="10px">
                 <Flex justify="start" w="80%">
@@ -14,7 +29,7 @@ const Users = ({u}) => {
                         <Image 
                         borderRadius='full'
                         boxSize='150px'
-                        src='https://bit.ly/dan-abramov'
+                        src={imgUrl}
                         alt='Dan Abramov'
                         boxSize="50px"
                         />

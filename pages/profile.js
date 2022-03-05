@@ -93,22 +93,11 @@ const Profile = () => {
             [validateData("games", gameArr)] : gameArr
         }
 
-        // const userCol = collection(getFirestore(), "user")
-        // const q = query(userCol, where("email", "==", getCookie()));
         const docRef = doc(getFirestore(), "user", userFromDatabase.id)
         console.log(docRef.id)
         await updateDoc(docRef, userObj)
-        // setCookie(data.email)
-        // const auth = getAuth()
-        // console.log(auth.currentUser.id)
-        // await updateProfile(auth.currentUser, {
-        //     email : data.email
-        // })
         console.log("updated")
         console.log(file[0])
-        
-        // const desertRef = ref(storage, `user_${userFromDatabase.email}`)
-        // const d = deleteObject(desertRef)
         const storageRef = ref(storage, `user_${userFromDatabase.id}`)
         const f = await uploadBytes(storageRef, file[0])
         router.reload()
